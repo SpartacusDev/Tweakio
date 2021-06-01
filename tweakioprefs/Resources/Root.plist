@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+		<array>
+		
+			<dict>
+				<key>cell</key>
+					<string>PSGroupCell</string>
+				<key>label</key>
+					<string>Package Managers</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<true/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakio.preferences</string>
+				<key>key</key>
+					<string>cydia</string>
+				<key>label</key>
+					<string>Cydia</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<true/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakio.preferences</string>
+				<key>key</key>
+					<string>zebra</string>
+				<key>label</key>
+					<string>Zebra</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<true/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakio.preferences</string>
+				<key>key</key>
+					<string>installer</string>
+				<key>label</key>
+					<string>Installer</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<true/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakio.preferences</string>
+				<key>key</key>
+					<string>sileo</string>
+				<key>label</key>
+					<string>Sileo</string>
+			</dict>
+			
+			<dict>
+				<key>cell</key>
+					<string>PSGroupCell</string>
+				<key>label</key>
+					<string>Links</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+					<string>PSButtonCell</string>
+				<key>action</key>
+					<string>openGithub</string>
+				<key>label</key>
+					<string>Github Repository</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+					<string>PSButtonCell</string>
+				<key>action</key>
+					<string>joinDiscord</string>
+				<key>label</key>
+					<string>Join the Discord Server</string>
+			</dict>
+
+			<dict>
+				<key>cell</key>
+					<string>PSGroupCell</string>
+				<key>label</key>
+					<string>API Differences Explanation</string>
+				<key>footerAlignment</key>
+					<string>0</string>
+				<key>footerText</key>
+					<string>The API is per package manager. To change API, open the settings in each package manager and click on the Tweakio button. From there you can change API.
+
+Differences between the APIs:
+	• Tweakio API - Made by me, Spartacus. Completely open sourced. Slow, contains over 500 repos, gives most results.
+	• Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
+	• Canister API - Made by Tale. Fast, used in Sileo as a built-in feature.</string>
+			</dict>
+		</array>
+	<key>title</key>
+		<string>Tweakio</string>
+</dict>
+</plist>

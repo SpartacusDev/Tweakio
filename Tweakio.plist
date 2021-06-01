@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple/DTD PLIST 1.0/EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Filter</key>
+            <dict>
+                <key>Bundles</key>
+                    <array>
+                        <string>com.saurik.Cydia</string>
+                        <string>xyz.willy.Zebra</string>
+                        <string>me.apptapp.installer</string>
+                        <string>org.coolstar.SileoStore</string>
+                    </array>
+            </dict>
+    </dict>
+</plist>

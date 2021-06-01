@@ -1,0 +1,8 @@
+# Theos cache
+.theos
+
+# Visual Studio Code stuff
+.vscode
+
+# Packages
+packages
