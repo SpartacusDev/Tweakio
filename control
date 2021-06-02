@@ -1,6 +1,6 @@
 Package: com.spartacus.tweakio
 Name: Tweakio
-Version: 0.0.1
+Version: 0.0.2
 Architecture: iphoneos-arm
 Description: A global package search tab for Cydia, Installer, Sileo and Zebra! 
 Depiction: https://spartacusdev.github.io/#/tweakio
