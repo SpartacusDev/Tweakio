@@ -11,53 +11,49 @@
 				<key>label</key>
 					<string>Package Managers</string>
 			</dict>
+			
 			<dict>
 				<key>cell</key>
-					<string>PSSwitchCell</string>
-				<key>default</key>
-					<true/>
-				<key>defaults</key>
-					<string>com.spartacus.tweakioprefs</string>
-				<key>key</key>
-					<string>cydia</string>
+					<string>PSLinkCell</string>
 				<key>label</key>
 					<string>Cydia</string>
+				<key>detail</key>
+					<string>CydiaListController</string>
+				<key>isController</key>
+					<true/>
 			</dict>
+
 			<dict>
 				<key>cell</key>
-					<string>PSSwitchCell</string>
-				<key>default</key>
-					<true/>
-				<key>defaults</key>
-					<string>com.spartacus.tweakioprefs</string>
-				<key>key</key>
-					<string>zebra</string>
-				<key>label</key>
-					<string>Zebra</string>
-			</dict>
-			<dict>
-				<key>cell</key>
-					<string>PSSwitchCell</string>
-				<key>default</key>
-					<true/>
-				<key>defaults</key>
-					<string>com.spartacus.tweakioprefs</string>
-				<key>key</key>
-					<string>installer</string>
+					<string>PSLinkCell</string>
 				<key>label</key>
 					<string>Installer</string>
+				<key>detail</key>
+					<string>InstallerListController</string>
+				<key>isController</key>
+					<true/>
 			</dict>
+
 			<dict>
 				<key>cell</key>
-					<string>PSSwitchCell</string>
-				<key>default</key>
-					<true/>
-				<key>defaults</key>
-					<string>com.spartacus.tweakioprefs</string>
-				<key>key</key>
-					<string>sileo</string>
+					<string>PSLinkCell</string>
 				<key>label</key>
 					<string>Sileo</string>
+				<key>detail</key>
+					<string>SileoListController</string>
+				<key>isController</key>
+					<true/>
+			</dict>
+
+			<dict>
+				<key>cell</key>
+					<string>PSLinkCell</string>
+				<key>label</key>
+					<string>Zebra</string>
+				<key>detail</key>
+					<string>ZebraListController</string>
+				<key>isController</key>
+					<true/>
 			</dict>
 			
 			<dict>
@@ -66,6 +62,7 @@
 				<key>label</key>
 					<string>Links</string>
 			</dict>
+
 			<dict>
 				<key>cell</key>
 					<string>PSButtonCell</string>
@@ -74,6 +71,7 @@
 				<key>label</key>
 					<string>Github Repository</string>
 			</dict>
+
 			<dict>
 				<key>cell</key>
 					<string>PSButtonCell</string>
@@ -91,15 +89,18 @@
 				<key>footerAlignment</key>
 					<string>0</string>
 				<key>footerText</key>
-					<string>The API is per package manager. To change API, open the settings in each package manager and click on the Tweakio button. From there you can change API.
+					<string>The API is per package manager. To change API, open Tweakio in each package manager and click on the settings button. From there you can change API.
 
 Differences between the APIs:
 	• Tweakio API - Made by me, Spartacus. Completely open sourced. Slow, contains over 500 repos, gives most results.
 	• Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
-	• Canister API - Made by Tale. Fast, used in Sileo as a built-in feature.</string>
+	• Canister API - Made by Tale. Fast, used in Sileo as a built-in feature, tells exact price for a package.</string>
 			</dict>
+		
 		</array>
+
 	<key>title</key>
 		<string>Tweakio</string>
+
 </dict>
 </plist>

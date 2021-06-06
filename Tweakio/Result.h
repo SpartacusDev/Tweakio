@@ -16,6 +16,7 @@
 @property (nonatomic, strong, readonly) NSURL *iconURL;
 @property (nonatomic, strong, readonly) NSURL *depiction;
 @property (nonatomic, strong, readonly) NSString *section;
+@property (nonatomic, strong, readonly) NSString *price;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dataDictionary;
 

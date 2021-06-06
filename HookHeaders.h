@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import "Tweakio/TweakioViewController.h"
 
 
 // Cydia
@@ -14,6 +14,12 @@
 
 @end
 
+@interface SearchController : UIViewController
+
+@property (nonatomic, strong) TweakioViewController *tweakio;
+
+@end
+
 
 // Zebra
 
@@ -26,24 +32,7 @@
 
 @interface ZBSearchTableViewController : UIViewController
 
-@property (assign) BOOL pushed;
-
-@end
-
-
-@interface ZBSearchResultsTableViewController : UIViewController
-
-@property (assign) BOOL pushed;
-
-@end
-
-
-@interface ZBPackageDepictionViewController : UIViewController
-
-@end
-
-
-@interface ZBSettingsTableViewController : UITableViewController
+@property (nonatomic, strong) TweakioViewController *tweakio;
 
 @end
 
@@ -58,5 +47,21 @@
 
 
 @interface AccountPlistViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
+
+@end
+
+@interface SearchViewController : UIViewController
+
+@property (nonatomic, strong) TweakioViewController *tweakio;
+
+@end
+
+
+// Sileo
+
+@interface _TtC5Sileo25PackageListViewController : UIViewController
+
+@property (nonatomic, strong) TweakioViewController *tweakio;
+@property (assign) BOOL showWishlist;
 
 @end

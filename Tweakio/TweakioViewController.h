@@ -1,9 +1,10 @@
 #import <UIKit/UIKit.h>
 #import "Result.h"
 
-@interface TweakioViewController : UITableViewController<UISearchBarDelegate>
+@interface TweakioViewController : UIViewController<UISearchBarDelegate, UISearchResultsUpdating>
 
 @property (nonatomic, strong) NSString *packageManager;
+@property (nonatomic, strong) UIColor *backgroundColor;
 
 - (instancetype)initWithPackageManager:(NSString *)packageManager;
 

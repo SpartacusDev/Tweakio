@@ -15,6 +15,7 @@
 @property (nonatomic, strong, readwrite) NSURL *iconURL;
 @property (nonatomic, strong, readwrite) NSURL *depiction;
 @property (nonatomic, strong, readwrite) NSString *section;
+@property (nonatomic, strong, readwrite) NSString *price;
 
 @end
 
@@ -30,7 +31,18 @@
         self.author = dataDictionary[@"author"];
         self.icon = dataDictionary[@"icon"];
         self.downloadURL = [dataDictionary objectForKey:@"filename"];
-        self.free = [dataDictionary objectForKey:@"free"] ? [dataDictionary[@"free"] performSelector:@selector(boolValue)] : NO;
+        if ([dataDictionary objectForKey:@"free"]) {
+            self.free = [dataDictionary objectForKey:@"free"] ? [dataDictionary[@"free"] performSelector:@selector(boolValue)] : NO;
+            self.price = nil;
+        } else {
+            if ([dataDictionary[@"price"] isEqualToString:@"Free"]) {
+                self.free = YES;
+                self.price = nil;
+            } else {
+                self.free = NO;
+                self.price = dataDictionary[@"price"];
+            }
+        }
         self.repo = dataDictionary[@"repo"];
         self.iconURL = dataDictionary[@"icon url"];
         self.depiction = dataDictionary[@"depiction"];

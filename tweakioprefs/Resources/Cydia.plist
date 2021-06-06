@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+		<array>
+            <dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<true/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakioprefs</string>
+				<key>key</key>
+					<string>cydia</string>
+				<key>label</key>
+					<string>Enabled</string>
+			</dict>
+
+            <dict>
+                <key>cell</key>
+                    <string>PSSegmentCell</string>
+                <key>label</key>
+                    <string>Tweakio Implementation</string>
+                <key>default</key>
+                    <integer>0</integer>
+                <key>defaults</key>
+                    <string>com.spartacus.tweakioprefs</string>
+                <key>key</key>
+                    <string>cydia hooking method</string>
+                <key>validTitles</key>
+                    <array>
+                        <string>Tab Bar</string>
+                        <string>Search Tab</string>
+                    </array>
+                <key>validValues</key>
+                    <array>
+                        <integer>0</integer>
+                        <integer>1</integer>
+                    </array>
+            </dict>
+
+            <dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<true/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakioprefs</string>
+				<key>key</key>
+					<string>cydia animation</string>
+				<key>label</key>
+					<string>Animation (only for the Search Tab)</string>
+			</dict>
+
+		</array>
+
+    <key>title</key>
+		<string>Cydia</string>
+</dict>
+</plist>

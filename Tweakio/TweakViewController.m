@@ -32,8 +32,8 @@
     [relevantInformation addObject:[NSString stringWithFormat:@"Package ID: %@", self.package.package]];
     [relevantInformation addObject:[NSString stringWithFormat:@"Author: %@", self.package.author]];
     [relevantInformation addObject:[NSString stringWithFormat:@"Version: %@", self.package.version]];
-    if ([self.package.package isEqualToString:@"UNKNOWN"])
-        [relevantInformation addObject:@"UNKNOWN PRICE"];
+    if (self.package.price != nil)
+        [relevantInformation addObject:self.package.price];
     else
         [relevantInformation addObject:self.package.free ? @"Free" : @"Paid"];
     [relevantInformation addObject:self.package.repo.url.absoluteString];
@@ -42,7 +42,7 @@
     
     self.information = [relevantInformation copy];
     
-    if (![self.package.package isEqualToString:@"UNKNOWN"] && self.package.free) {
+    if (self.package.free) {
         UIBarButtonItem *download = [[UIBarButtonItem alloc] initWithTitle:@"Download" style:UIBarButtonItemStylePlain target:self action:@selector(download:)];
         [self.navigationItem setRightBarButtonItem:download];
     }

@@ -10,6 +10,7 @@
                         <string>xyz.willy.Zebra</string>
                         <string>me.apptapp.installer</string>
                         <string>org.coolstar.SileoStore</string>
+                        <string>org.coolstar.SileoBeta</string>
                     </array>
             </dict>
     </dict>

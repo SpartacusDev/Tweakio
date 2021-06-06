@@ -1,9 +1,48 @@
-#import "Tweakio/ZBMoreViewController.h"
-#import "Tweakio/TweakioViewController.h"
-#import "Settings/Settings.h"
 #import "HookHeaders.h"
+#import "Tweakio/ZBMoreViewController.h"
 #define preferencesPath @"/var/mobile/Library/Preferences/com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
+
+
+%hook ZBSearchTableViewController
+
+%property (nonatomic, strong) TweakioViewController *tweakio;
+
+- (void)viewDidLoad {
+    %orig;
+
+    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	NSNumber *zebra = (NSNumber *)[prefs objectForKey:@"zebra"];
+	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"zebra hooking method"];
+	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 1)) return;
+
+	self.tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Zebra"];
+
+    UIBarButtonItem *tweakio = [[UIBarButtonItem alloc] initWithTitle:@"Tweakio" style:UIBarButtonItemStylePlain target:self action:@selector(openTweakio:)];
+    [self.navigationItem setLeftBarButtonItem:tweakio];
+}
+
+%new - (void)openTweakio:(UIBarButtonItem *)sender {
+	[self.tweakio setBackgroundColor:self.view.backgroundColor];
+
+	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	NSNumber *animation = [prefs objectForKey:@"zebra animation"];
+
+	if (animation && !animation.boolValue) {
+		[self.navigationController pushViewController:self.tweakio animated:NO];
+		return;
+	}
+	
+    CATransition *transition = [[CATransition alloc] init];
+	[transition setDuration:0.3];
+	[transition setType:@"flip"];
+	[transition setSubtype:kCATransitionFromLeft];
+	[self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
+	
+	[self.navigationController pushViewController:self.tweakio animated:NO];
+}
+
+%end
 
 %group ZBiPhones
 
@@ -13,8 +52,9 @@
 	BOOL original = %orig(application, launchOptions);
 
 	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
-	NSObject *zebra = [prefs objectForKey:@"zebra"];
-	if (zebra && ![zebra performSelector:@selector(boolValue)]) return original;
+	NSNumber *zebra = (NSNumber *)[prefs objectForKey:@"zebra"];
+	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"zebra hooking method"];
+	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return original;
 
 	if (original) {
 		NSMutableArray *controllers = [((UITabBarController *)self.window.rootViewController).viewControllers mutableCopy];
@@ -24,21 +64,8 @@
 		[navcont setTabBarItem:searchTabBarItem];
 		[more.viewControllers addObject:((UINavigationController *)controllers.lastObject).viewControllers.firstObject];
 		[more.viewControllers addObject:[[TweakioViewController alloc] initWithPackageManager:@"Zebra"]];
-		// UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:[[%c(ZBMoreViewController) alloc] init]];
-		// // UIImage *icon = [UIImage systemImageNamed:@"more"];
-		// UITabBarItem *tweakioTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tweakio" image:nil selectedImage:nil];
-		// [navController setTabBarItem:tweakioTabBarItem];
-
-		// NSMutableArray *controllers = [((UITabBarController *)self.window.rootViewController).viewControllers mutableCopy];
-
-		// UINavigationController *search = [[UINavigationController alloc] initWithRootViewController:((UINavigationController *)controllers.lastObject).viewControllers.firstObject];
-		// UITabBarItem *searchTabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemSearch tag:controllers.count];
-		// [searchTabBarItem setTitle:((UINavigationController *)controllers.lastObject).tabBarItem.title];
-		// [search setTabBarItem:searchTabBarItem];
 
 		[controllers removeObject:controllers.lastObject];
-		// [controllers addObject:search];
-		// [controllers addObject:navController];
 		[controllers addObject:navcont];
 
 		[((UITabBarController *)self.window.rootViewController) setViewControllers:controllers];
@@ -58,8 +85,9 @@
 	BOOL original = %orig(application, launchOptions);
 
 	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
-	NSObject *zebra = [prefs objectForKey:@"zebra"];
-	if (zebra && ![zebra performSelector:@selector(boolValue)]) return original;
+	NSNumber *zebra = (NSNumber *)[prefs objectForKey:@"zebra"];
+	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"zebra hooking method"];
+	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return original;
 
 	if (original) {
 		NSMutableArray *controllers = [((UINavigationController *)self.window.rootViewController).viewControllers mutableCopy];
@@ -78,23 +106,6 @@
 }
 
 %end
-
-%end
-
-%hook ZBSettingsTableViewController
-
-- (void)viewDidLoad {
-	%orig;
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
-	NSObject *zebra = [prefs objectForKey:@"zebra"];
-	if (zebra && ![zebra performSelector:@selector(boolValue)]) return;
-	UIBarButtonItem *tweakioSettings = [[UIBarButtonItem alloc] initWithTitle:@"Tweakio" style:UIBarButtonItemStylePlain target:self action:@selector(openTweakioSettings:)];
-	[self.navigationItem setLeftBarButtonItem:tweakioSettings];
-}
-
-%new - (void)openTweakioSettings:(UIBarButtonItem *)sender {
-	[self.navigationController pushViewController:[[Settings alloc] initWithPackageManager:@"Zebra" andBackgroundColor:self.view.backgroundColor] animated:YES];
-}
 
 %end
 

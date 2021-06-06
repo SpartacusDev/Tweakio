@@ -11,7 +11,7 @@ TWEAK_NAME = Tweakio
 BUNDLE_NAME = com.spartacus.tweakio
 
 $(BUNDLE_NAME)_INSTALL_PATH = /Library/MobileSubstrate/DynamicLibraries
-$(TWEAK_NAME)_FILES = $(wildcard *.x) $(wildcard Tweakio/*.m) $(wildcard Settings/*.m)
+$(TWEAK_NAME)_FILES = $(wildcard *.x) $(wildcard Tweakio/*.m)
 $(TWEAK_NAME)_CFLAGS = -fobjc-arc
 
 include $(THEOS)/makefiles/bundle.mk

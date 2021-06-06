@@ -7,7 +7,7 @@ ARCHS = arm64 arm64e
 
 BUNDLE_NAME = TweakioPrefs
 
-$(BUNDLE_NAME)_FILES = TweakioRootListController.m
+$(BUNDLE_NAME)_FILES = $(wildcard *.m)
 $(BUNDLE_NAME)_FRAMEWORKS = UIKit
 $(BUNDLE_NAME)_PRIVATE_FRAMEWORKS = Preferences
 $(BUNDLE_NAME)_INSTALL_PATH = /Library/PreferenceBundles
