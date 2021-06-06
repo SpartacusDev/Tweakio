@@ -7,7 +7,8 @@ The tweak adds an extra tab to each package manager, as you can see in the .x fi
 ## Differences between the APIs
 * Tweakio API - Made by me, Spartacus. Completely open sourced. Slow, contains over 500 repos, gives most results.
 * Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
-* Canister API - Made by Tale. Fast, used in Sileo as a built-in feature.
+* Canister API - Made by Tale. Fast, used in Sileo as a built-in feature, has exact price for each package.
+If in doubt, I suggest either Parcility or Canister (as the Tweakio API is slow).
 
 # Contributing
 Feel free to contribute by making a pull request
