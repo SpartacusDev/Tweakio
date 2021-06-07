@@ -13,17 +13,18 @@
 	NSNumber *sileo = (NSNumber *)[prefs objectForKey:@"sileo"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"sileo hooking method"];
 	if ((sileo && !sileo.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return;
+	
+    UIWindow *window = [self performSelector:@selector(window)];
+	NSMutableArray<UINavigationController *> *controllers = [((UITabBarController *)window.rootViewController).viewControllers mutableCopy];
 
+	TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Sileo"];
 
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:[[TweakioViewController alloc] initWithPackageManager:@"Sileo"]];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:tweakio];
     NSBundle *bundle = [[NSBundle alloc] initWithPath:bundlePath];
     UIImage *icon = [UIImage imageWithContentsOfFile:[bundle pathForResource:@"icon" ofType:@"png"]];
     UITabBarItem *tweakioTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tweakio" image:icon selectedImage:icon];
     [navController setTabBarItem:tweakioTabBarItem];
     
-    UIWindow *window = [self performSelector:@selector(window)];
-    NSMutableArray *controllers = [((UITabBarController *)window.rootViewController).viewControllers mutableCopy];
-
     [controllers addObject:navController];
     [((UITabBarController *)window.rootViewController) setViewControllers:controllers];
     [self performSelector:@selector(setWindow:) withObject:window];

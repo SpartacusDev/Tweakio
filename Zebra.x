@@ -57,13 +57,16 @@
 	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return original;
 
 	if (original) {
-		NSMutableArray *controllers = [((UITabBarController *)self.window.rootViewController).viewControllers mutableCopy];
+		NSMutableArray<UINavigationController *> *controllers = [((UITabBarController *)self.window.rootViewController).viewControllers mutableCopy];
 		ZBMoreViewController *more = [[ZBMoreViewController alloc] init];
 		UINavigationController *navcont = [[UINavigationController alloc] initWithRootViewController:more];
 		UITabBarItem *searchTabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemMore tag:controllers.count];
 		[navcont setTabBarItem:searchTabBarItem];
-		[more.viewControllers addObject:((UINavigationController *)controllers.lastObject).viewControllers.firstObject];
-		[more.viewControllers addObject:[[TweakioViewController alloc] initWithPackageManager:@"Zebra"]];
+
+		TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Zebra"];
+
+		[more.viewControllers addObject:controllers.lastObject.viewControllers.firstObject];
+		[more.viewControllers addObject:tweakio];
 
 		[controllers removeObject:controllers.lastObject];
 		[controllers addObject:navcont];

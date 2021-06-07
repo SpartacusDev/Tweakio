@@ -58,13 +58,15 @@
 	UIWindow *window = (UIWindow *)object_getIvar(self, class_getInstanceVariable([self class], "window_"));
 
 	if (((UINavigationController *)(window.rootViewController)).viewControllers.count < 6) {
-		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:[[TweakioViewController alloc] initWithPackageManager:@"Cydia"]];
+		NSMutableArray<UINavigationController *> *controllers = [((UINavigationController *)window.rootViewController).viewControllers mutableCopy];
+
+		TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Cydia"];
+		
+		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:tweakio];
 		NSBundle *bundle = [[NSBundle alloc] initWithPath:bundlePath];
 		UIImage *icon = [UIImage imageWithContentsOfFile:[bundle pathForResource:@"icon" ofType:@"png"]];
 		UITabBarItem *tweakioTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tweakio" image:icon selectedImage:icon];
 		[navController setTabBarItem:tweakioTabBarItem];
-
-		NSMutableArray *controllers = [((UINavigationController *)window.rootViewController).viewControllers mutableCopy];
 
 		[controllers addObject:navController];
 		[(UINavigationController *)(window.rootViewController) setViewControllers:[controllers copy]];

@@ -56,14 +56,16 @@
 
 
 	if (original) {
-		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:[[TweakioViewController alloc] initWithPackageManager:@"Installer"]];
+		NSMutableArray<UINavigationController *> *controllers = [((UINavigationController *)self.window.rootViewController).viewControllers mutableCopy];
+
+		TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Installer"];
+
+		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:tweakio];
 		NSBundle *bundle = [[NSBundle alloc] initWithPath:bundlePath];
 		UIImage *icon = [UIImage imageWithContentsOfFile:[bundle pathForResource:@"icon" ofType:@"png"]];
 		UITabBarItem *tweakioTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tweakio" image:icon selectedImage:icon];
 		[navController setTabBarItem:tweakioTabBarItem];
 		
-		NSMutableArray *controllers = [((UINavigationController *)self.window.rootViewController).viewControllers mutableCopy];
-
 		[controllers addObject:navController];
 		[((UINavigationController *)self.window.rootViewController) setViewControllers:controllers];
 	}

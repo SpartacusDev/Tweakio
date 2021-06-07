@@ -46,7 +46,6 @@
     [self.activityIndicator setCenter:self.view.center];
     [self.view addSubview:self.activityIndicator];
 
-    
     self.results = [NSArray array];
 
     NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
@@ -59,12 +58,15 @@
 
     UIBarButtonItem *settings = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStylePlain target:self action:@selector(openSettings:)];
     [self.navigationItem setRightBarButtonItem:settings];
+
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    [self.view setBackgroundColor:self.backgroundColor];
+    if (self.backgroundColor)
+        [self.view setBackgroundColor:self.backgroundColor];
 
     NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
     self.preferredAPI = ((NSNumber *)prefs[[NSString stringWithFormat:@"%@ API", self.packageManager]]).intValue;
