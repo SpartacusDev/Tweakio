@@ -5,6 +5,7 @@
 - (NSArray *)specifiers {
 	if (!_specifiers) {
 		_specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+		[self removeSpecifier:[self specifierForID:@"LEGACY_NOTE"] animated:NO];
 	}
 	return _specifiers;
 }

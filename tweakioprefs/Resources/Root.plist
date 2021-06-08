@@ -55,6 +55,19 @@
 				<key>isController</key>
 					<true/>
 			</dict>
+
+			<dict>
+				<key>cell</key>
+					<string>PSSwitchCell</string>
+				<key>default</key>
+					<false/>
+				<key>defaults</key>
+					<string>com.spartacus.tweakioprefs</string>
+				<key>key</key>
+					<string>never show legacy note</string>
+				<key>id</key>
+					<string>LEGACY_NOTE</string>
+			</dict>
 			
 			<dict>
 				<key>cell</key>

@@ -74,8 +74,23 @@
 }
 
 - (BOOL)legacy {
+    __block NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:preferencesPath];
+    NSNumber *legacy = (NSNumber *)[prefs objectForKey:[NSString stringWithFormat:@"%@ legacy", self.packageManager.lowercaseString]];
+    if (legacy && legacy.boolValue) return YES;
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    return ([fileManager fileExistsAtPath:@"/.bootstrapped"] || [fileManager fileExistsAtPath:@"/.installed_unc0ver"]);
+    if (([fileManager fileExistsAtPath:@"/.bootstrapped"] || [fileManager fileExistsAtPath:@"/.installed_unc0ver"]) && !([prefs objectForKey:@"never show legacy note"] && ((NSNumber *)prefs[@"never show legacy note"]).boolValue)) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Important!\nYou are using unc0ver/checkra1n" message:@"Please consider to activate Legacy Mode in preferences because the tweak may be buggy on these jailbreaks" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil];
+        UIAlertAction *neverAgain = [UIAlertAction actionWithTitle:@"Never show again" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){
+            prefs[@"never show legacy note"] = [NSNumber numberWithBool:YES];
+            [prefs writeToURL:[NSURL fileURLWithPath:preferencesPath] error:nil];
+        }];
+        [alert addAction:ok];
+        [alert addAction:neverAgain];
+        [self presentViewController:alert animated:YES completion:NULL];
+    }
+    return NO;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

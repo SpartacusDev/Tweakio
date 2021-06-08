@@ -100,5 +100,10 @@
 	if (![prefs objectForKey:@"installer animation"]) prefs[@"installer animation"] = [NSNumber numberWithBool:YES];
 	if (![prefs objectForKey:@"sileo animation"]) prefs[@"sileo animation"] = [NSNumber numberWithBool:YES];
 
+	if (![prefs objectForKey:@"cydia legacy"]) prefs[@"cydia legacy"] = [NSNumber numberWithBool:NO];
+	if (![prefs objectForKey:@"zebra legacy"]) prefs[@"zebra legacy"] = [NSNumber numberWithBool:NO];
+	if (![prefs objectForKey:@"installer legacy"]) prefs[@"installer legacy"] = [NSNumber numberWithBool:NO];
+	if (![prefs objectForKey:@"sileo legacy"]) prefs[@"sileo legacy"] = [NSNumber numberWithBool:NO];
+
 	[prefs writeToURL:[NSURL fileURLWithPath:preferencesPath] error:nil];
 }
