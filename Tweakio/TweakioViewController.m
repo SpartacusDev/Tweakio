@@ -13,6 +13,7 @@
 @property (nonatomic, strong) UISearchController *searchController;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (assign) int preferredAPI;
+@property (nonatomic, strong) UISearchBar *searchBar;
 
 @end
 
@@ -29,15 +30,25 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.searchController = [[UISearchController alloc] initWithSearchResultsController:[[TweakioResultsViewController alloc] initWithNavigationController:self.navigationController andPackageManager:self.packageManager]];
-    [self.searchController setObscuresBackgroundDuringPresentation:NO];
-    [self.searchController setSearchResultsUpdater:self];
-    [self.searchController.searchBar setDelegate:self];
-    [self.searchController.searchBar setPlaceholder:@"Search Packages"];
-    [self.navigationItem setSearchController:self.searchController];
-    [self.navigationItem setHidesSearchBarWhenScrolling:NO];
-
-    [self setTitle:@"Tweakio"];
+    if ([self legacy]) {
+        self.searchBar = [[UISearchBar alloc] init];
+        [self.searchBar setDelegate:self];
+        [self.searchBar setPlaceholder:@"Search Packages"];
+        [self.navigationItem setTitleView:self.searchBar];
+        [self setDefinesPresentationContext:YES];
+        [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
+        [self.tableView setDelegate:self];
+        [self.tableView setDataSource:self];
+    } else {
+        self.searchController = [[UISearchController alloc] initWithSearchResultsController:[[TweakioResultsViewController alloc] initWithNavigationController:self.navigationController andPackageManager:self.packageManager]];
+        [self.searchController setObscuresBackgroundDuringPresentation:NO];
+        [self.searchController setSearchResultsUpdater:self];
+        [self.searchController.searchBar setDelegate:self];
+        [self.searchController.searchBar setPlaceholder:@"Search Packages"];
+        [self.navigationItem setSearchController:self.searchController];
+        [self.navigationItem setHidesSearchBarWhenScrolling:NO];
+        [self setTitle:@"Tweakio"];
+    }
     
     if (@available(iOS 13, *))
         self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
@@ -60,6 +71,11 @@
     [self.navigationItem setRightBarButtonItem:settings];
 
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+}
+
+- (BOOL)legacy {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    return ([fileManager fileExistsAtPath:@"/.bootstrapped"] || [fileManager fileExistsAtPath:@"/.installed_unc0ver"]);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -145,6 +161,8 @@
             self.results = [NSArray array];
             break;
     }
+    if (self.results.count != 0)
+        [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
@@ -152,6 +170,7 @@
     NSString *tweak = searchBar.text;
     if ([tweak isEqualToString:@""]) {
         self.results = [NSArray array];
+        [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         return;
     }
     
@@ -160,8 +179,10 @@
         [self search:tweak];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.activityIndicator stopAnimating];
-            
-            [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results andBackgroundColor:self.backgroundColor];
+            if ([self legacy])
+                [self.tableView reloadData];
+            else
+                [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results andBackgroundColor:self.backgroundColor];
         });
     });
 }
@@ -174,9 +195,48 @@
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
     if ([searchBar.text isEqualToString:@""]) {
-        [((TweakioResultsViewController *)self.searchController.searchResultsController) clear];
         self.results = [NSArray array];
+        if ([self legacy]) {
+            [self.tableView reloadData];
+            [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        } else
+            [((TweakioResultsViewController *)self.searchController.searchResultsController) clear];
     }
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.results.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"   forIndexPath:indexPath];
+
+    if (cell == nil) {
+     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+    }
+    
+    UIImageView *icon = [[UIImageView alloc] initWithImage:self.results[indexPath.row].icon.class == NSNull.class ? nil : self.results[indexPath.row].icon];
+    [icon setFrame:CGRectMake(cell.frame.origin.x + 10, cell.frame.size.height / 4, 20, 20)];
+    [cell setIcon:icon];
+    UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(
+                                                               icon.frame.origin.x + icon.frame.size.width * 1.5,
+                                                               0,
+                                                               cell.frame.size.width - icon.frame.origin.x + icon.frame.size.width,
+                                                               cell.frame.size.height)];
+    [title setText:[self.results[indexPath.row].name isEqualToString:@""] ? self.results[indexPath.row].package : self.results[indexPath.row].name];
+    [title setTextAlignment:NSTextAlignmentLeft];
+    [cell setTitle:title];
+    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    TweakViewController *tweakViewController = [[TweakViewController alloc] initWithPackage:self.results[indexPath.row] andPackageManager:self.packageManager];
+    [self.navigationController pushViewController:tweakViewController animated:YES];
 }
 
 @end
