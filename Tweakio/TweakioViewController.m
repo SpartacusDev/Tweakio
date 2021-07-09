@@ -3,7 +3,8 @@
 #import "TweakioResultsViewController.h"
 #import "Settings.h"
 #import "UITableViewCell+CydiaLike.h"
-#define preferencesPath @"/var/mobile/Library/Preferences/com.spartacus.tweakioprefs.plist"
+#import <Cephei/HBPreferences.h>
+#define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
 
@@ -49,17 +50,10 @@
         [self.navigationItem setHidesSearchBarWhenScrolling:NO];
         [self setTitle:@"Tweakio"];
     }
-    
-    if (@available(iOS 13, *))
-        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
-    else
-        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [self.activityIndicator setCenter:self.view.center];
-    [self.view addSubview:self.activityIndicator];
 
     self.results = [NSArray array];
 
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
     NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:[NSString stringWithFormat:@"%@ hooking method", self.packageManager.lowercaseString]];
 
     if (hookingMethod && hookingMethod.intValue == 1) {
@@ -74,17 +68,16 @@
 }
 
 - (BOOL)legacy {
-    __block NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:preferencesPath];
+    __block HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
     NSNumber *legacy = (NSNumber *)[prefs objectForKey:[NSString stringWithFormat:@"%@ legacy", self.packageManager.lowercaseString]];
     if (legacy && legacy.boolValue) return YES;
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (([fileManager fileExistsAtPath:@"/.bootstrapped"] || [fileManager fileExistsAtPath:@"/.installed_unc0ver"]) && !([prefs objectForKey:@"never show legacy note"] && ((NSNumber *)prefs[@"never show legacy note"]).boolValue)) {
+    if (([fileManager fileExistsAtPath:@"/.bootstrapped"] || [fileManager fileExistsAtPath:@"/.installed_unc0ver"]) && !([prefs objectForKey:@"never show legacy note"] && ((NSNumber *)[prefs objectForKey:@"never show legacy note"]).boolValue)) {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Important!\nYou are using unc0ver/checkra1n" message:@"Please consider to activate Legacy Mode in preferences because the tweak may be buggy on these jailbreaks" preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil];
         UIAlertAction *neverAgain = [UIAlertAction actionWithTitle:@"Never show again" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){
-            prefs[@"never show legacy note"] = [NSNumber numberWithBool:YES];
-            [prefs writeToURL:[NSURL fileURLWithPath:preferencesPath] error:nil];
+            [prefs setObject:@YES forKey:@"never show legacy note"];
         }];
         [alert addAction:ok];
         [alert addAction:neverAgain];
@@ -99,12 +92,24 @@
     if (self.backgroundColor)
         [self.view setBackgroundColor:self.backgroundColor];
 
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
-    self.preferredAPI = ((NSNumber *)prefs[[NSString stringWithFormat:@"%@ API", self.packageManager]]).intValue;
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
+    self.preferredAPI = ((NSNumber *)[prefs objectForKey:[NSString stringWithFormat:@"%@ API", self.packageManager]]).intValue;
+
+    if (self.activityIndicator) [self.activityIndicator removeFromSuperview];
+    
+    if (@available(iOS 13, *))
+        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+    else
+        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [self.activityIndicator setCenter:self.view.center];
+    [self.view addSubview:self.activityIndicator];
+
+	[self.activityIndicator.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+	[self.activityIndicator.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
 }
 
 - (void)goBack:(UIBarButtonItem *)sender {
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *animation = [prefs objectForKey:[NSString stringWithFormat:@"%@ animation", self.packageManager.lowercaseString]];
 
 	if (animation && !animation.boolValue) {
@@ -129,10 +134,14 @@
     switch (self.preferredAPI) {
         case 0:
             @try {
-                self.results = spartacusAPI(query);
+                HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
+                BOOL fast = [prefs objectForKey:[NSString stringWithFormat:@"%@ Tweakio", self.packageManager]] ?
+                            !((NSNumber *)([prefs objectForKey:[NSString stringWithFormat:@"%@ Tweakio", self.packageManager]])).boolValue :
+                            YES;
+                self.results = spartacusAPI(query, fast);
             } @catch (NSException *exception) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:@"Please try again later or change API." preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", exception] preferredStyle:UIAlertControllerStyleAlert];
                     [self presentViewController:alert animated:YES completion:^{
                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                             [alert dismissViewControllerAnimated:YES completion:NULL];
@@ -147,7 +156,7 @@
                 self.results = parcilityAPI(query);
             } @catch (NSException *exception) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:@"Please try again later or change API." preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", exception] preferredStyle:UIAlertControllerStyleAlert];
                     [self presentViewController:alert animated:YES completion:^{
                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                             [alert dismissViewControllerAnimated:YES completion:NULL];
@@ -162,7 +171,7 @@
                 self.results = canisterAPI(query);
             } @catch (NSException *exception) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:@"Please try again later or change API." preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", exception] preferredStyle:UIAlertControllerStyleAlert];
                     [self presentViewController:alert animated:YES completion:^{
                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                             [alert dismissViewControllerAnimated:YES completion:NULL];
@@ -190,6 +199,7 @@
     }
     
     [self.activityIndicator startAnimating];
+    [((TweakioResultsViewController *)self.searchController.searchResultsController) startAnimating];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self search:tweak];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -197,7 +207,7 @@
             if ([self legacy])
                 [self.tableView reloadData];
             else
-                [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results andBackgroundColor:self.backgroundColor];
+                [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results];
         });
     });
 }
@@ -211,11 +221,12 @@
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
     if ([searchBar.text isEqualToString:@""]) {
         self.results = [NSArray array];
-        if ([self legacy]) {
+        if ([self legacy])
             [self.tableView reloadData];
+        else {
             [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
-        } else
             [((TweakioResultsViewController *)self.searchController.searchResultsController) clear];
+        }
     }
 }
 
@@ -224,14 +235,18 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (![self legacy]) {
+        [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        return 0;
+    }
     return self.results.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"   forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
     if (cell == nil) {
-     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
     
     UIImageView *icon = [[UIImageView alloc] initWithImage:self.results[indexPath.row].icon.class == NSNull.class ? nil : self.results[indexPath.row].icon];
@@ -256,9 +271,13 @@
 
 @end
 
-NSArray<Result *> *spartacusAPI(NSString *query) {
+NSArray<Result *> *spartacusAPI(NSString *query, BOOL fast) {
     query = [query stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-    NSURL *api = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"https://spartacusdev.herokuapp.com/api/search/%@", query]];
+    NSURL *api = [[NSURL alloc] initWithString:
+        fast ? 
+        [NSString stringWithFormat:@"https://spartacusdev.herokuapp.com/api/search/%@", query]
+        : [NSString stringWithFormat:@"https://spartacusdev.herokuapp.com/api/search_harder/%@", query]
+    ];
     NSData *data = [NSData dataWithContentsOfURL:api];
     if (!data) {
         @throw [[NSException alloc] initWithName:@"APIException" reason:@"UNKNOWN" userInfo:nil];
@@ -294,7 +313,7 @@ NSArray<Result *> *spartacusAPI(NSString *query) {
             @"free": result[@"free"],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repo"]] andName:result[@"repo name"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];
@@ -340,7 +359,7 @@ NSArray<Result *> *parcilityAPI(NSString *query) {
             @"free": [NSNumber numberWithBool:[[results[@"Tag"] componentsSeparatedByString:@", "] containsObject:@"cydia::commercial"]],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repo"][@"url"]] andName:result[@"repo"][@"label"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"Depiction"] ? [NSURL URLWithString:result[@"Depiction"]] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"Depiction"] ? [NSURL URLWithString:result[@"Depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"Section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];
@@ -385,7 +404,7 @@ NSArray<Result *> *canisterAPI(NSString *query) {
             @"price": result[@"price"],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repository"][@"uri"]] andName:result[@"repository"][@"name"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];

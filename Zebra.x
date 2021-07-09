@@ -1,6 +1,8 @@
+// #import <objc/runtime.h>
+#import <Cephei/HBPreferences.h>
 #import "HookHeaders.h"
 #import "Tweakio/ZBMoreViewController.h"
-#define preferencesPath @"/var/mobile/Library/Preferences/com.spartacus.tweakioprefs.plist"
+#define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
 
@@ -11,7 +13,7 @@
 - (void)viewDidLoad {
     %orig;
 
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *zebra = (NSNumber *)[prefs objectForKey:@"zebra"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"zebra hooking method"];
 	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 1)) return;
@@ -25,7 +27,7 @@
 %new - (void)openTweakio:(UIBarButtonItem *)sender {
 	[self.tweakio setBackgroundColor:self.view.backgroundColor];
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *animation = [prefs objectForKey:@"zebra animation"];
 
 	if (animation && !animation.boolValue) {
@@ -42,6 +44,60 @@
 	[self.navigationController pushViewController:self.tweakio animated:NO];
 }
 
+// - (void)setupView {
+// 	%orig;
+// 	UISearchController *searchController = (UISearchController *)object_getIvar(self, class_getInstanceVariable([self class], "searchController"));
+// 	if (searchController.searchBar.scopeButtonTitles.count == 3) {
+// 		NSMutableArray<NSString *> *values = [searchController.searchBar.scopeButtonTitles mutableCopy];
+// 		[values addObject:@"Tweakio"];
+// 		searchController.searchBar.scopeButtonTitles = [values copy];
+// 	}
+// }
+
+// - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+// 	if (searchController.searchBar.selectedScopeButtonIndex == 3) {
+// 		UISearchController *searchController2 = [[UISearchController alloc] initWithSearchResultsController:[[TweakioResultsViewController alloc] initWithNavigationController:self.navigationController andPackageManager:@"Zebra"]];
+//         [searchController2 setDelegate:searchController.delegate];
+//         [searchController2 setSearchResultsUpdater:searchController.searchResultsUpdater];
+//         [searchController2.searchBar setDelegate:searchController.searchBar.delegate];
+//         [searchController2.searchBar setTintColor:searchController.searchBar.tintColor];
+//         [searchController2.searchBar setPlaceholder:searchController.searchBar.placeholder];
+//         [searchController2.searchBar setScopeButtonTitles:searchController.searchBar.scopeButtonTitles];
+//         [searchController2.searchBar setAutocapitalizationType:searchController.searchBar.autocapitalizationType];
+// 		[searchController2.searchBar setSelectedScopeButtonIndex:3];
+// 		[self.navigationItem setSearchController:searchController2];
+// 		return;
+// 	}
+// 	searchController = (UISearchController *)object_getIvar(self, class_getInstanceVariable([self class], "searchController"));
+// 	%orig(searchController);
+// }
+
+// - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+// 	UISearchController *searchController = self.navigationItem.searchController;
+// 	if (searchController.searchBar.selectedScopeButtonIndex == 3) {
+// 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+// 			NSArray<Result *> *packages = nil;
+// 			@try {
+// 				packages = spartacusAPI(searchBar.text);
+// 			} @catch (NSException *exception) {
+// 				dispatch_async(dispatch_get_main_queue(), ^{
+//                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:@"Please try again later or change API." preferredStyle:UIAlertControllerStyleAlert];
+//                     [self presentViewController:alert animated:YES completion:^{
+//                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                             [alert dismissViewControllerAnimated:YES completion:NULL];
+//                         });
+//                     }];
+//                 });
+// 			}
+// 			if (packages) {
+// 				[((TweakioResultsViewController *)searchController.searchResultsController) setupWithResults:packages andBackgroundColor:self.view.backgroundColor];
+// 			}
+// 		});
+// 		return;
+// 	}
+// 	%orig(searchBar);
+// }
+
 %end
 
 %group ZBiPhones
@@ -51,7 +107,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	BOOL original = %orig(application, launchOptions);
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *zebra = (NSNumber *)[prefs objectForKey:@"zebra"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"zebra hooking method"];
 	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return original;
@@ -87,7 +143,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	BOOL original = %orig(application, launchOptions);
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *zebra = (NSNumber *)[prefs objectForKey:@"zebra"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"zebra hooking method"];
 	if ((zebra && !zebra.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return original;

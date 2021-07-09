@@ -29,4 +29,13 @@
     return @"";
 }
 
+- (NSArray<NSString *> *)arrayAddTo {
+    return @[
+        [NSString stringWithFormat:@"cydia://url/https://cydia.saurik.com/api/share#?source=%@", self.url.absoluteString],
+        [NSString stringWithFormat:@"zbra://sources/add/%@", self.url.absoluteString],
+        [NSString stringWithFormat:@"installer://add/%@", self.url.absoluteString],
+        [NSString stringWithFormat:@"sileo://source/%@", self.url.absoluteString]
+    ];
+}
+
 @end

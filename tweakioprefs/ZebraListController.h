@@ -1,6 +1,6 @@
-#import <Preferences/PSListController.h>
+#import <CepheiPrefs/HBListController.h>
 
 
-@interface ZebraListController : PSListController
+@interface ZebraListController : HBListController
 
 @end

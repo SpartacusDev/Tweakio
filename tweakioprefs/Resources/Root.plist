@@ -21,6 +21,8 @@
 					<string>CydiaListController</string>
 				<key>isController</key>
 					<true/>
+				<key>id</key>
+					<string>0</string>
 			</dict>
 
 			<dict>
@@ -32,6 +34,8 @@
 					<string>InstallerListController</string>
 				<key>isController</key>
 					<true/>
+				<key>id</key>
+					<string>1</string>
 			</dict>
 
 			<dict>
@@ -43,6 +47,21 @@
 					<string>SileoListController</string>
 				<key>isController</key>
 					<true/>
+				<key>id</key>
+					<string>2</string>
+			</dict>
+
+			<dict>
+				<key>cell</key>
+					<string>PSLinkCell</string>
+				<key>label</key>
+					<string>Tweakio App</string>
+				<key>detail</key>
+					<string>TweakioListController</string>
+				<key>isController</key>
+					<true/>
+				<key>id</key>
+					<string>3</string>
 			</dict>
 
 			<dict>
@@ -54,19 +73,8 @@
 					<string>ZebraListController</string>
 				<key>isController</key>
 					<true/>
-			</dict>
-
-			<dict>
-				<key>cell</key>
-					<string>PSSwitchCell</string>
-				<key>default</key>
-					<false/>
-				<key>defaults</key>
-					<string>com.spartacus.tweakioprefs</string>
-				<key>key</key>
-					<string>never show legacy note</string>
 				<key>id</key>
-					<string>LEGACY_NOTE</string>
+					<string>4</string>
 			</dict>
 			
 			<dict>
@@ -105,8 +113,14 @@
 					<string>The API is per package manager. To change API, open Tweakio in each package manager and click on the settings button. From there you can change API.
 
 Differences between the APIs:
-	• Tweakio API - Made by me, Spartacus. Completely open sourced. Slow, contains over 500 repos, gives most results.
+
+	• Tweakio API - Made by me, Spartacus. Completely open sourced. Unstable, contains over 500 repos, can gives most results, in exchange of speed.
+
+		• `Fast search` brings less results, but much faster
+		• `More results` is slower but bring much more results
+
 	• Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
+
 	• Canister API - Made by Tale. Fast, used in Sileo as a built-in feature, tells exact price for a package.</string>
 			</dict>
 		

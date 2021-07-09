@@ -1,6 +1,6 @@
-#import <Preferences/PSListController.h>
+#import <CepheiPrefs/HBListController.h>
 
 
-@interface SileoListController : PSListController
+@interface SileoListController : HBListController
 
 @end

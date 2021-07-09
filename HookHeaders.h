@@ -65,3 +65,13 @@
 @property (assign) BOOL showWishlist;
 
 @end
+
+
+
+// Tweakio App
+
+@interface TWAppDelegate : UIResponder<UIApplicationDelegate>
+
+@property (nonatomic, strong) UIWindow *window;
+
+@end

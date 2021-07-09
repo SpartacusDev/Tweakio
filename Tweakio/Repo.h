@@ -8,5 +8,6 @@
 
 - (instancetype)initWithURL:(NSURL *)url andName:(NSString *)name;
 - (NSString *)addTo:(NSString *)packageManager;
+- (NSArray<NSString *> *)arrayAddTo;
 
 @end

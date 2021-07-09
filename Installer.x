@@ -1,5 +1,6 @@
+#import <Cephei/HBPreferences.h>
 #import "HookHeaders.h"
-#define preferencesPath @"/var/mobile/Library/Preferences/com.spartacus.tweakioprefs.plist"
+#define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
 
@@ -10,7 +11,7 @@
 - (void)viewDidLoad {
     %orig;
 
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *installer = (NSNumber *)[prefs objectForKey:@"installer"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"installer hooking method"];
 	if ((installer && !installer.boolValue) || (hookingMethod && hookingMethod.intValue != 1)) return;
@@ -24,7 +25,7 @@
 %new - (void)openTweakio:(UIBarButtonItem *)sender {
 	[self.tweakio setBackgroundColor:self.view.backgroundColor];
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *animation = [prefs objectForKey:@"installer animation"];
 
 	if (animation && !animation.boolValue) {
@@ -49,7 +50,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	BOOL original = %orig(application, launchOptions);
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *installer = (NSNumber *)[prefs objectForKey:@"installer"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"installer hooking method"];
 	if ((installer && !installer.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return original;
@@ -73,20 +74,3 @@
 }
 
 %end
-
-// %hook AccountPlistViewController
-
-// - (void)viewDidLoad {
-// 	%orig;
-// 	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
-// 	NSObject *installer = [prefs objectForKey:@"installer"];
-// 	if (installer && ![installer performSelector:@selector(boolValue)]) return;
-// 	UIBarButtonItem *tweakioSettings = [[UIBarButtonItem alloc] initWithTitle:@"Tweakio" style:UIBarButtonItemStylePlain target:self action:@selector(openTweakioSettings:)];
-// 	[self.navigationItem setRightBarButtonItem:tweakioSettings];
-// }
-
-// %new - (void)openTweakioSettings:(UIBarButtonItem *)sender {
-// 	[self.navigationController pushViewController:[[Settings alloc] initWithPackageManager:@"Installer" andBackgroundColor:self.view.backgroundColor] animated:YES];
-// }
-
-// %end

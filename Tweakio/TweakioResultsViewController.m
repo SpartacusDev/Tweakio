@@ -1,11 +1,45 @@
+#import <objc/runtime.h>
 #import "TweakioResultsViewController.h"
 #import "UITableViewCell+CydiaLike.h"
 #import "TweakViewController.h"
 
 
+@interface UITableView (SearchResults)
+
+@property (nonatomic, strong) NSNumber *hasBeenSetup;
+
+@end
+
+@implementation UITableView (SearchResults)
+
+- (void)setHasBeenSetup:(NSNumber *)hasBeenSetup {
+    static UIActivityIndicatorView *activityIndicatorView = nil;
+    if (!activityIndicatorView) {
+        if (@available(iOS 13, *))
+            activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+        else
+            activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [activityIndicatorView setCenter:self.center];
+        [self addSubview:activityIndicatorView];
+
+        [activityIndicatorView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+        [activityIndicatorView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    }
+    if (!hasBeenSetup.boolValue) [activityIndicatorView startAnimating];
+    else [activityIndicatorView stopAnimating];
+    objc_setAssociatedObject(self, @selector(hasBeenSetup), hasBeenSetup, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)hasBeenSetup {
+    return objc_getAssociatedObject(self, @selector(icon));
+}
+
+@end
+
+
 @interface TweakioResultsViewController ()
 
-@property (nonatomic, strong) UITableView *tableView;
+// @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong, readwrite) UINavigationController *navigationController;
 
 @end
@@ -26,10 +60,11 @@
     
     self.results = [NSArray array];
     
-    self.tableView = [[UITableView alloc] initWithFrame:UIScreen.mainScreen.bounds style:UITableViewStylePlain];
-    [self.tableView setDelegate:self];
-    [self.tableView setDataSource:self];
+    // self.tableView = [[UITableView alloc] initWithFrame:UIScreen.mainScreen.bounds style:UITableViewStylePlain];
+    // [self.tableView setDelegate:self];
+    // [self.tableView setDataSource:self];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -38,19 +73,27 @@
     self.results = [NSArray array];
     [self.tableView reloadData];
     
-    [self.tableView removeFromSuperview];
+    // [self.tableView removeFromSuperview];
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 }
 
-- (void)setupWithResults:(NSArray<Result *> *)results andBackgroundColor:(UIColor *)backgroundColor {
+- (void)startAnimating {
+    [self.tableView setHasBeenSetup:@NO];
+}
+
+- (void)setupWithResults:(NSArray<Result *> *)results {
     self.results = results;
-    [self.view setBackgroundColor:backgroundColor];
-    [self.view addSubview:self.tableView];
+    // [self.view setBackgroundColor:backgroundColor];
+    // [self.view addSubview:self.tableView];
+    [self.tableView setHasBeenSetup:@YES];
     [self.tableView reloadData];
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
 }
 
 - (void)clear {
     self.results = [NSArray array];
     [self.tableView reloadData];
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -62,10 +105,10 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"   forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
     if (cell == nil) {
-     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
     
     UIImageView *icon = [[UIImageView alloc] initWithImage:self.results[indexPath.row].icon.class == NSNull.class ? nil : self.results[indexPath.row].icon];

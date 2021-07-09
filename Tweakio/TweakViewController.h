@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "Result.h"
 
-@interface TweakViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
+@interface TweakViewController : UITableViewController
 
 @property (nonatomic, strong) NSString *packageManager;
 

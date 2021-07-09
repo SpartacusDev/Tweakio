@@ -9,7 +9,7 @@
 @implementation ZBMoreViewController
 
 - (instancetype)init {
-    self = [super init];
+    self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) self.viewControllers = [NSMutableArray array];
     return self;
 }
@@ -32,22 +32,27 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
     if (cell == nil) {
-     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
     
     switch (indexPath.row) {
         case 0: {
-            UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-            [icon setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBSearch.png", bundlePath]]]];
-            [cell setAccessoryView:icon];
+            // UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+            // [icon setImage:];
+            // [cell setAccessoryView:icon];
+            [cell.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBSearch.png", bundlePath]]]];
             [cell.textLabel setText:@"Search"];
+            [cell.textLabel setTextAlignment:NSTextAlignmentLeft];
+            cell.semanticContentAttribute = UISemanticContentAttributeForceLeftToRight;
             break;
         }
         case 1: {
-            UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
-            [icon setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBIcon.png", bundlePath]]]];
-            [cell setAccessoryView:icon];
+            // UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
+            // [icon setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBIcon.png", bundlePath]]]];
+            [cell.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBIcon.png", bundlePath]]]];
             [cell.textLabel setText:@"Tweakio"];
+            [cell.textLabel setTextAlignment:NSTextAlignmentLeft];
+            cell.semanticContentAttribute = UISemanticContentAttributeForceLeftToRight;
             break;
         }
         default:

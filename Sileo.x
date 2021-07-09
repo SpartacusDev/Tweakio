@@ -1,6 +1,7 @@
 #import <objc/runtime.h>
+#import <Cephei/HBPreferences.h>
 #import "HookHeaders.h"
-#define preferencesPath @"/var/mobile/Library/Preferences/com.spartacus.tweakioprefs.plist"
+#define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
 
@@ -9,7 +10,7 @@
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
 	%orig(application);
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *sileo = (NSNumber *)[prefs objectForKey:@"sileo"];
 	NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"sileo hooking method"];
 	if ((sileo && !sileo.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return;
@@ -39,7 +40,7 @@
 - (void)viewDidLoad {
     %orig;
 
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *sileo = (NSNumber *)[prefs objectForKey:@"sileo"];
     NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"sileo hooking method"];
 	if ((sileo && !sileo.boolValue) || (hookingMethod && hookingMethod.intValue != 1) || (NSObject *)object_getIvar(self, class_getInstanceVariable(self.class, "repoContext")) || self.showWishlist) return;
@@ -53,7 +54,7 @@
 %new - (void)openTweakio:(UIBarButtonItem *)sender {
 	[self.tweakio setBackgroundColor:self.view.backgroundColor];
 
-	NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *animation = [prefs objectForKey:@"sileo animation"];
 
 	if (animation && !animation.boolValue) {
@@ -72,23 +73,7 @@
 
 %end
 
-%hook SileoSettingsViewController
-
-// - (void)viewDidLoad {
-// 	%orig;
-//     NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:preferencesPath];
-// 	NSObject *sileo = [prefs objectForKey:@"sileo"];
-// 	if (sileo && ![sileo performSelector:@selector(boolValue)]) return;
-// 	UIBarButtonItem *tweakioSettings = [[UIBarButtonItem alloc] initWithTitle:@"Tweakio" style:UIBarButtonItemStylePlain target:self action:@selector(openTweakioSettings:)];
-// 	[[self performSelector:@selector(navigationItem)] performSelector:@selector(setLeftBarButtonItem:) withObject:tweakioSettings];
-// }
-
-// %new - (void)openTweakioSettings:(UIBarButtonItem *)sender {
-// 	[(UINavigationController *)[self performSelector:@selector(navigationController)] pushViewController:[[Settings alloc] initWithPackageManager:@"Sileo" andBackgroundColor:((UIView *)[self performSelector:@selector(view)]).backgroundColor] animated:YES];
-// }
-
-%end
 
 %ctor {
-    %init(SileoAppDelegate = NSClassFromString(@"Sileo.AppDelegate"), SileoSettingsViewController = NSClassFromString(@"Sileo.SettingsViewController"));
+    %init(SileoAppDelegate = NSClassFromString(@"Sileo.AppDelegate"));
 }

@@ -1,3 +1,4 @@
+// #import "TweakioResultsViewController.h"
 #import <UIKit/UIKit.h>
 #import "Result.h"
 
@@ -11,6 +12,6 @@
 @end
 
 
-NSArray<Result *> *spartacusAPI(NSString *query);
+NSArray<Result *> *spartacusAPI(NSString *query, BOOL fast);
 NSArray<Result *> *parcilityAPI(NSString *query);
 NSArray<Result *> *canisterAPI(NSString *query);

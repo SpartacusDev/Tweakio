@@ -1,6 +1,6 @@
-#import <Preferences/PSListController.h>
+#import <CepheiPrefs/HBListController.h>
 
 
-@interface CydiaListController : PSListController
+@interface CydiaListController : HBListController
 
 @end

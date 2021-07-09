@@ -1,13 +1,15 @@
 #import "Settings.h"
-#define preferencesPath @"/var/mobile/Library/Preferences/com.spartacus.tweakioprefs.plist"
+#import <Cephei/HBPreferences.h>
+#define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 
 
 @interface Settings ()
 
 @property (nonatomic, strong) UIPickerView *pickerView;
-@property (nonatomic, strong) NSMutableDictionary *prefs;
+@property (nonatomic, strong) HBPreferences *prefs;
 @property (nonatomic, strong) NSString *packageManager;
 @property (nonatomic, strong) UIColor *backgroundColor;
+@property (nonatomic, strong) UISegmentedControl *tweakioAPISearchingMethod;
 
 @end
 
@@ -18,9 +20,9 @@
 	if (self) {
 		self.backgroundColor = backgroundColor;
 		self.packageManager = packageManager;
-		self.prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:preferencesPath];
-		if (![self.prefs objectForKey:[NSString stringWithFormat:@"%@ API", self.packageManager]]) self.prefs[[NSString stringWithFormat:@"%@ API", self.packageManager]] = 0;
-		[self.prefs writeToURL:[NSURL fileURLWithPath:preferencesPath] error:nil];  // If it's somehow not in the plist
+		self.prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
+		if (![self.prefs objectForKey:[NSString stringWithFormat:@"%@ API", self.packageManager]])
+			[self.prefs setObject:@0 forKey:[NSString stringWithFormat:@"%@ API", self.packageManager]];
 	}
 	return self;
 }
@@ -30,26 +32,61 @@
 	[self.view setBackgroundColor:self.backgroundColor];
 
 	self.pickerView = [[UIPickerView alloc] init];
-	[self.pickerView setFrame:CGRectMake(
-		(self.view.frame.size.width - self.pickerView.frame.size.width) / 2,
-		(self.view.frame.size.height - self.pickerView.frame.size.height) / 2,
-		self.pickerView.frame.size.width,
-		self.pickerView.frame.size.height
-	)];
+	[self.pickerView setCenter:self.view.center];
+
+	self.pickerView.translatesAutoresizingMaskIntoConstraints = NO;
 
 	[self.pickerView setDataSource:self];
 	[self.pickerView setDelegate:self];
-	[self.pickerView selectRow:((NSNumber *)self.prefs[[NSString stringWithFormat:@"%@ API", self.packageManager]]).intValue inComponent:0 animated:YES];
+	[self.pickerView selectRow:((NSNumber *)[self.prefs objectForKey:[NSString stringWithFormat:@"%@ API", self.packageManager]]).intValue inComponent:0 animated:YES];
 	[self.view addSubview:self.pickerView];
-}
+	
+	[self.pickerView.widthAnchor constraintEqualToConstant:self.pickerView.frame.size.width].active = YES;
+	[self.pickerView.heightAnchor constraintEqualToConstant:self.pickerView.frame.size.height].active = YES;
+	[self.pickerView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+	[self.pickerView.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:25].active = YES;
 
-- (void)viewDidDisappear:(BOOL)animated {
-	[super viewDidDisappear:animated];
-	[self.prefs writeToURL:[NSURL fileURLWithPath:preferencesPath] error:nil];
+	if ([self.pickerView selectedRowInComponent:0] == 0) [self presentSegmentedControl];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-	self.prefs[[NSString stringWithFormat:@"%@ API", self.packageManager]] = [[NSNumber alloc] initWithInteger:row];
+	[self.prefs setObject:[NSNumber numberWithInteger:row] forKey:[NSString stringWithFormat:@"%@ API", self.packageManager]];
+	switch (row) {
+		case 0: {
+			if (self.tweakioAPISearchingMethod && self.tweakioAPISearchingMethod.superview) return;
+			[self presentSegmentedControl];
+			break;
+		}
+		default:
+			[self.tweakioAPISearchingMethod removeFromSuperview];
+	}
+}
+
+- (void)presentSegmentedControl {
+	if (!self.tweakioAPISearchingMethod) {
+		self.tweakioAPISearchingMethod = [[UISegmentedControl alloc] initWithItems:@[
+			@"Faster",
+			@"More results"
+		]];
+		
+		[self.tweakioAPISearchingMethod addTarget:self action:@selector(selectSearchingMethod:) forControlEvents:UIControlEventValueChanged];
+
+		[self.tweakioAPISearchingMethod setCenter:self.view.center];
+
+		NSString *key = [NSString stringWithFormat:@"%@ Tweakio", self.packageManager];
+		if (![self.prefs objectForKey:key])
+			[self.prefs setObject:@0 forKey:key];
+		[self.tweakioAPISearchingMethod setSelectedSegmentIndex:((NSNumber *)[self.prefs objectForKey:key]).intValue];
+	}
+	[self.view addSubview:self.tweakioAPISearchingMethod];
+	[self.tweakioAPISearchingMethod.widthAnchor constraintEqualToConstant:self.tweakioAPISearchingMethod.frame.size.width].active = YES;
+	[self.tweakioAPISearchingMethod.heightAnchor constraintEqualToConstant:self.tweakioAPISearchingMethod.frame.size.height].active = YES;
+	[self.tweakioAPISearchingMethod.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+	[self.tweakioAPISearchingMethod.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:25].active = YES;
+}
+
+- (void)selectSearchingMethod:(UISegmentedControl *)sender {
+	[self.prefs setObject:[NSNumber numberWithInteger:sender.selectedSegmentIndex] forKey:[NSString stringWithFormat:@"%@ Tweakio", self.packageManager]];
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
