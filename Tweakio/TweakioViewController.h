@@ -15,3 +15,4 @@
 NSArray<Result *> *spartacusAPI(NSString *query, BOOL fast);
 NSArray<Result *> *parcilityAPI(NSString *query);
 NSArray<Result *> *canisterAPI(NSString *query);
+NSArray<Result *> *iosrepoupdatesAPI(NSString *query);
