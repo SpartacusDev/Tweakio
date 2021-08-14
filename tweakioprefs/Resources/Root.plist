@@ -122,6 +122,8 @@ Differences between the APIs:
 	• Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
 
 	• Canister API - Made by Tale. Fast, used in Sileo as a built-in feature, tells exact price for a package.</string>
+
+	• iOS Repo Updates API - Made by @relisiuol. Fast, tells exact price for a package, piracy-free and no offline repos.</string>
 			</dict>
 		
 		</array>
