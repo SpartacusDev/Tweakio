@@ -181,6 +181,21 @@
                 self.results = [NSArray array];
             }
             break;
+        case 3:
+            @try {
+                self.results = iosrepoupdatesAPI(query);
+            } @catch (NSException *exception) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", exception] preferredStyle:UIAlertControllerStyleAlert];
+                    [self presentViewController:alert animated:YES completion:^{
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            [alert dismissViewControllerAnimated:YES completion:NULL];
+                        });
+                    }];
+                });
+                self.results = [NSArray array];
+            }
+            break;
         default:  // How did we get here?
             self.results = [NSArray array];
             break;
@@ -379,6 +394,51 @@ NSArray<Result *> *canisterAPI(NSString *query) {
     NSMutableArray *resultsArray = [NSMutableArray array];
 
     for (NSDictionary *result in results[@"data"]) {
+        NSObject *icon;
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]]])
+            icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]]]];
+        else
+            icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/unknown.png", bundlePath]]];
+
+        NSString *iconURL;
+        if ([result[@"packageIcon"] isEqualToString:@""] || [result[@"packageIcon"] hasPrefix:@"file://"] || ((NSObject *)results[@"packageIcon"]).class == NSNull.class) {
+            iconURL = [NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]];
+            if (![[NSFileManager defaultManager] fileExistsAtPath:iconURL])
+                iconURL = [NSString stringWithFormat:@"%@/unknown.png", bundlePath];
+        }
+        else
+            iconURL = result[@"packageIcon"];
+
+        NSDictionary *data = @{
+            @"name": result[@"name"],
+            @"package": result[@"identifier"],
+            @"version": result[@"latestVersion"],
+            @"description": result[@"description"],
+            @"author": result[@"author"],
+            @"icon": icon,
+            @"price": result[@"price"],
+            @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repository"][@"uri"]] andName:result[@"repository"][@"name"]],
+            @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
+            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
+            @"section": result[@"section"],
+        };
+        [resultsArray addObject:[[Result alloc] initWithDictionary:data]];
+    }
+    return [resultsArray copy];
+}
+
+NSArray<Result *> *iosrepoupdatesAPI(NSString *query) {
+    query = [query stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSURL *api = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"https://api.ios-repo-updates.com/1.0/search?s=%@", query]];
+    NSData *data = [NSData dataWithContentsOfURL:api];
+    if (!data) {
+        @throw [[NSException alloc] initWithName:@"APIException" reason:@"UNKNOWN" userInfo:nil];
+        return [NSArray array];
+    }
+    NSDictionary *results = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
+    NSMutableArray *resultsArray = [NSMutableArray array];
+
+    for (NSDictionary *result in results[@"packages"]) {
         NSObject *icon;
         if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]]])
             icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]]]];
