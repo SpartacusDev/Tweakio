@@ -119,7 +119,7 @@
                                                                0,
                                                                cell.frame.size.width - icon.frame.origin.x + icon.frame.size.width,
                                                                cell.frame.size.height)];
-    [title setText:[self.results[indexPath.row].name isEqualToString:@""] ? self.results[indexPath.row].package : self.results[indexPath.row].name];
+    [title setText:[self.results[indexPath.row].name isEqual:@""] || self.results[indexPath.row].name.class == NSNull.class ? self.results[indexPath.row].package : self.results[indexPath.row].name];
     [title setTextAlignment:NSTextAlignmentLeft];
     [cell setTitle:title];
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
