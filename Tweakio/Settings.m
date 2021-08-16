@@ -94,7 +94,7 @@
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component { 
-    return 3;
+    return 4;
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
@@ -105,6 +105,8 @@
 			return @"Parcility API";
 		case 2:
 			return @"Canister API";
+		case 3:
+			return @"iOS Repo Updates API";
 		default:
 			return @"Achievement unlocked: How did we get here?";  // I mean, I do want to return something
 	}
