@@ -5,10 +5,10 @@ Search packages globally directly from your favourite package manager! Works wit
 The tweak adds an extra tab to each package manager, as you can see in the .x files. What's in the extra tab is the Tweakio view controller. The Tweakio search utilizes a restAPI, such as the Tweakio API, Parcility API, Canister API and iOS Repo Updates API. In order to choose the API (default is Tweakio API), you simply open the in-app settings in your package manager, select Tweakio (in Cydia you will see two button, `About` and `Tweakio`, in the rest you will see it at either top left or top right, depending on your device language) and then choose the API.
 
 ## Differences between the APIs
-* Tweakio API - Made by me, Spartacus. Completely open sourced. Slow, contains over 500 repos, gives most results.
-* Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
-* Canister API - Made by Tale. Fast, used in Sileo as a built-in feature, has exact price for each package.
-* iOS Repo Updates API - Made by @relisiuol. Fast, tells exact price for a package, piracy-free and no offline repos.
+* Tweakio API - Made by me, [Spartacus](https://github.com/SpartacusDev). Completely open sourced. Slow, contains over 500 repos, gives most results.
+* Parcility API - Made by the [Zenith Team](https://github.com/ZenithDevs). Fast, contains over 600 repos.
+* Canister API - Made by [Tale](https://github.com/tale). Fast, used in Sileo as a built-in feature, has exact price for each package.
+* iOS Repo Updates API - Made by [relisiuol](https://github.com/relisiuol). Fast, tells exact price for a package, piracy-free and no offline repos.
 If in doubt, I suggest either iOS-Repo-Updates or Canister.
 
 # Contributing
