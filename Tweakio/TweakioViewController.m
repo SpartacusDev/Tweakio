@@ -272,7 +272,7 @@
                                                                0,
                                                                cell.frame.size.width - icon.frame.origin.x + icon.frame.size.width,
                                                                cell.frame.size.height)];
-    [title setText:[self.results[indexPath.row].name isEqualToString:@""] ? self.results[indexPath.row].package : self.results[indexPath.row].name];
+    [title setText:[self.results[indexPath.row].name isEqual:@""] || self.results[indexPath.row].name.class == NSNull.class ? self.results[indexPath.row].package : self.results[indexPath.row].name];
     [title setTextAlignment:NSTextAlignmentLeft];
     [cell setTitle:title];
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -309,7 +309,7 @@ NSArray<Result *> *spartacusAPI(NSString *query, BOOL fast) {
             icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/unknown.png", bundlePath]]];
         
         NSString *iconURL;
-        if ([result[@"icon"] isEqualToString:@""] || [result[@"icon"] hasPrefix:@"file://"] || ((NSObject *)results[@"icon"]).class == NSNull.class) {
+        if (((NSObject *)result[@"icon"]).class == NSNull.class || [result[@"icon"] isEqual:@""] || [result[@"icon"] hasPrefix:@"file://"] || ((NSObject *)results[@"icon"]).class == NSNull.class) {
             iconURL = [NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]];
             if (![[NSFileManager defaultManager] fileExistsAtPath:iconURL])
                 iconURL = [NSString stringWithFormat:@"%@/unknown.png", bundlePath];
@@ -322,13 +322,13 @@ NSArray<Result *> *spartacusAPI(NSString *query, BOOL fast) {
             @"package": result[@"package"],
             @"version": result[@"version"],
             @"description": result[@"description"],
-            @"author": result[@"author"],
+            @"author": result[@"author"] && ((NSObject *)result[@"author"]).class != NSNull.class ? result[@"author"] : @"UNKNOWN",
             @"icon": icon,
             @"filename": [NSURL URLWithString:result[@"filename"]],
             @"free": result[@"free"],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repo"]] andName:result[@"repo name"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"depiction"] && ((NSObject *)result[@"depiction"]).class != NSNull.class ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];
@@ -355,7 +355,7 @@ NSArray<Result *> *parcilityAPI(NSString *query) {
             icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/unknown.png", bundlePath]]];
 
         NSString *iconURL;
-        if ([result[@"Icon"] isEqualToString:@""] || [result[@"Icon"] hasPrefix:@"file://"] || ((NSObject *)results[@"Icon"]).class == NSNull.class) {
+        if (((NSObject *)result[@"Icon"]).class == NSNull.class || [result[@"Icon"] isEqual:@""] || [result[@"Icon"] hasPrefix:@"file://"] || ((NSObject *)results[@"Icon"]).class == NSNull.class) {
             iconURL = [NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"Section"]];
             if (![[NSFileManager defaultManager] fileExistsAtPath:iconURL])
                 iconURL = [NSString stringWithFormat:@"%@/unknown.png", bundlePath];
@@ -368,13 +368,13 @@ NSArray<Result *> *parcilityAPI(NSString *query) {
             @"package": result[@"Package"],
             @"version": result[@"Version"],
             @"description": result[@"Description"],
-            @"author": result[@"Author"],
+            @"author": result[@"Author"] && ((NSObject *)result[@"Author"]).class != NSNull.class ? result[@"Author"] : @"UNKNOWN",
             @"icon": icon,
             @"filename": [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", result[@"repo"][@"url"], ((NSArray *)result[@"builds"]).lastObject[@"Filename"]]],
             @"free": [NSNumber numberWithBool:[[results[@"Tag"] componentsSeparatedByString:@", "] containsObject:@"cydia::commercial"]],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repo"][@"url"]] andName:result[@"repo"][@"label"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"Depiction"] ? [NSURL URLWithString:result[@"Depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"Depiction"] && ((NSObject *)result[@"Depiction"]).class != NSNull.class ? [NSURL URLWithString:result[@"Depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"Section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];
@@ -401,7 +401,7 @@ NSArray<Result *> *canisterAPI(NSString *query) {
             icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/unknown.png", bundlePath]]];
 
         NSString *iconURL;
-        if ([result[@"packageIcon"] isEqualToString:@""] || [result[@"packageIcon"] hasPrefix:@"file://"] || ((NSObject *)results[@"packageIcon"]).class == NSNull.class) {
+        if (((NSObject *)result[@"packageIcon"]).class == NSNull.class || [result[@"packageIcon"] isEqual:@""] || [result[@"packageIcon"] hasPrefix:@"file://"] || ((NSObject *)results[@"packageIcon"]).class == NSNull.class) {
             iconURL = [NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]];
             if (![[NSFileManager defaultManager] fileExistsAtPath:iconURL])
                 iconURL = [NSString stringWithFormat:@"%@/unknown.png", bundlePath];
@@ -414,12 +414,12 @@ NSArray<Result *> *canisterAPI(NSString *query) {
             @"package": result[@"identifier"],
             @"version": result[@"latestVersion"],
             @"description": result[@"description"],
-            @"author": result[@"author"],
+            @"author": result[@"author"] && ((NSObject *)result[@"author"]).class != NSNull.class ? result[@"author"] : @"UNKNOWN",
             @"icon": icon,
             @"price": result[@"price"],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repository"][@"uri"]] andName:result[@"repository"][@"name"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"depiction"] && ((NSObject *)result[@"depiction"]).class != NSNull.class ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];
@@ -446,7 +446,7 @@ NSArray<Result *> *iosrepoupdatesAPI(NSString *query) {
             icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/unknown.png", bundlePath]]];
 
         NSString *iconURL;
-        if ([result[@"packageIcon"] isEqualToString:@""] || [result[@"packageIcon"] hasPrefix:@"file://"] || ((NSObject *)results[@"packageIcon"]).class == NSNull.class) {
+        if (((NSObject *)result[@"packageIcon"]).class == NSNull.class || [result[@"packageIcon"] isEqual:@""] || [result[@"packageIcon"] hasPrefix:@"file://"] || ((NSObject *)results[@"packageIcon"]).class == NSNull.class) {
             iconURL = [NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]];
             if (![[NSFileManager defaultManager] fileExistsAtPath:iconURL])
                 iconURL = [NSString stringWithFormat:@"%@/unknown.png", bundlePath];
@@ -459,12 +459,12 @@ NSArray<Result *> *iosrepoupdatesAPI(NSString *query) {
             @"package": result[@"identifier"],
             @"version": result[@"latestVersion"],
             @"description": result[@"description"],
-            @"author": result[@"author"],
+            @"author": result[@"author"] && ((NSObject *)result[@"author"]).class != NSNull.class ? result[@"author"] : @"UNKNOWN",
             @"icon": icon,
             @"price": result[@"price"],
             @"repo": [[Repo alloc] initWithURL:[NSURL URLWithString:result[@"repository"][@"uri"]] andName:result[@"repository"][@"name"]],
             @"icon url": [iconURL hasPrefix:@"http"] ? [NSURL URLWithString:iconURL] : [NSURL fileURLWithPath:iconURL],
-            @"depiction": [result objectForKey:@"depiction"] ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
+            @"depiction": [result objectForKey:@"depiction"] && ((NSObject *)result[@"depiction"]).class != NSNull.class ? [NSURL URLWithString:result[@"depiction"]] ?: [NSURL URLWithString:@""] : [NSURL URLWithString:@""],
             @"section": result[@"section"],
         };
         [resultsArray addObject:[[Result alloc] initWithDictionary:data]];

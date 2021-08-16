@@ -63,6 +63,7 @@
 
 @property (nonatomic, strong) TweakioViewController *tweakio;
 @property (assign) BOOL showWishlist;
+@property (nonatomic, strong) NSString *packagesLoadIdentifier;
 
 @end
 

@@ -43,7 +43,7 @@
     HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
 	NSNumber *sileo = (NSNumber *)[prefs objectForKey:@"sileo"];
     NSNumber *hookingMethod = (NSNumber *)[prefs objectForKey:@"sileo hooking method"];
-	if ((sileo && !sileo.boolValue) || (hookingMethod && hookingMethod.intValue != 1) || (NSObject *)object_getIvar(self, class_getInstanceVariable(self.class, "repoContext")) || self.showWishlist) return;
+	if ((sileo && !sileo.boolValue) || (hookingMethod && hookingMethod.intValue != 1) || (NSObject *)object_getIvar(self, class_getInstanceVariable(self.class, "repoContext")) || self.showWishlist || [self.packagesLoadIdentifier containsString:@"wishlist"]) return;
 
     self.tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Sileo"];
 

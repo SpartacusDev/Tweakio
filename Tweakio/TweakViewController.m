@@ -86,7 +86,7 @@
         });
     });
     UILabel *name = [[UILabel alloc] initWithFrame:CGRectMake(0, header.frame.size.height - 20, header.frame.size.width, 20)];
-    [name setText:self.package.name];
+    [name setText:self.package.name.class == NSNull.class ? self.package.package : self.package.name];
     [name setTextAlignment:NSTextAlignmentCenter];
     [header addSubview:name];
 

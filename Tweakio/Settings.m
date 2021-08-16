@@ -69,6 +69,8 @@
 			@"More results"
 		]];
 		
+		self.tweakioAPISearchingMethod.translatesAutoresizingMaskIntoConstraints = NO;
+
 		[self.tweakioAPISearchingMethod addTarget:self action:@selector(selectSearchingMethod:) forControlEvents:UIControlEventValueChanged];
 
 		[self.tweakioAPISearchingMethod setCenter:self.view.center];
@@ -82,7 +84,7 @@
 	[self.tweakioAPISearchingMethod.widthAnchor constraintEqualToConstant:self.tweakioAPISearchingMethod.frame.size.width].active = YES;
 	[self.tweakioAPISearchingMethod.heightAnchor constraintEqualToConstant:self.tweakioAPISearchingMethod.frame.size.height].active = YES;
 	[self.tweakioAPISearchingMethod.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-	[self.tweakioAPISearchingMethod.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:25].active = YES;
+	[self.tweakioAPISearchingMethod.topAnchor constraintEqualToAnchor:self.pickerView.bottomAnchor constant:25].active = YES;
 }
 
 - (void)selectSearchingMethod:(UISegmentedControl *)sender {

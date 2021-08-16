@@ -9,7 +9,7 @@ The tweak adds an extra tab to each package manager, as you can see in the .x fi
 * Parcility API - Made by the Zenith Team. Fast, contains over 600 repos.
 * Canister API - Made by Tale. Fast, used in Sileo as a built-in feature, has exact price for each package.
 * iOS Repo Updates API - Made by @relisiuol. Fast, tells exact price for a package, piracy-free and no offline repos.
-If in doubt, I suggest either Parcility or Canister (as the Tweakio API is slow).
+If in doubt, I suggest either iOS-Repo-Updates or Canister.
 
 # Contributing
 Feel free to contribute by making a pull request
@@ -19,7 +19,8 @@ Please either file an issue here in the GitHub repo (I may not see it fast, whic
 
 # Credits
 * Thanks to everyone who has made/maintained Cydia, Installer, Zebra and Sileo
-* Thanks to everyone who has made/maintained Parcility API and Canister API
+* Thanks to everyone who has made/maintained Parcility API, Canister API and iOS Repo Updates
 * Thanks to everyone who has made/modified the BigBoss icons, which I use in this tweak
 * Thanks to Randy420 for helping me with some random bugs every now and then
+* Thanks to relisiuol for making a PR with iOS Repo Updates support
 * Thanks to my trusty beta testers
