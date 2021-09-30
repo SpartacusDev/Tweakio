@@ -1,6 +1,7 @@
 #import <objc/runtime.h>
 #import <Cephei/HBPreferences.h>
 #import "HookHeaders.h"
+#import "Tweakio/TWMoreViewController.h"
 #define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
@@ -16,17 +17,31 @@
 	if ((sileo && !sileo.boolValue) || (hookingMethod && hookingMethod.intValue != 0)) return;
 	
     UIWindow *window = [self performSelector:@selector(window)];
-	NSMutableArray<UINavigationController *> *controllers = [((UITabBarController *)window.rootViewController).viewControllers mutableCopy];
+    NSMutableArray<UINavigationController *> *controllers = [((UITabBarController *)window.rootViewController).viewControllers mutableCopy];
 
-	TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Sileo"];
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Sileo"];
+        UINavigationController *navController = (UINavigationController *)[[NSClassFromString(@"Sileo.SileoNavigationController") alloc] initWithRootViewController:tweakio];
+        NSBundle *bundle = [[NSBundle alloc] initWithPath:bundlePath];
+        UIImage *icon = [UIImage imageWithContentsOfFile:[bundle pathForResource:@"icon" ofType:@"png"]];
+        UITabBarItem *tweakioTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tweakio" image:icon selectedImage:icon];
+        [navController setTabBarItem:tweakioTabBarItem];
+        [controllers addObject:navController];
+    } else {
+        TWMoreViewController *more = [[TWMoreViewController alloc] init];
+        UINavigationController *navcont = (UINavigationController *)[[NSClassFromString(@"Sileo.SileoNavigationController") alloc] initWithRootViewController:more];
+        UITabBarItem *searchTabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemMore tag:controllers.count];
+        [navcont setTabBarItem:searchTabBarItem];
 
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:tweakio];
-    NSBundle *bundle = [[NSBundle alloc] initWithPath:bundlePath];
-    UIImage *icon = [UIImage imageWithContentsOfFile:[bundle pathForResource:@"icon" ofType:@"png"]];
-    UITabBarItem *tweakioTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tweakio" image:icon selectedImage:icon];
-    [navController setTabBarItem:tweakioTabBarItem];
-    
-    [controllers addObject:navController];
+        TweakioViewController *tweakio = [[TweakioViewController alloc] initWithPackageManager:@"Sileo"];
+        [more.viewControllers addObject:controllers.lastObject.viewControllers.firstObject];
+        [more.viewControllers addObject:tweakio];
+
+        [controllers removeObject:controllers.lastObject];
+        [controllers addObject:navcont];
+    }
+
+	
     [((UITabBarController *)window.rootViewController) setViewControllers:controllers];
     [self performSelector:@selector(setWindow:) withObject:window];
 }
@@ -74,6 +89,56 @@
 %end
 
 
+%hook FeaturedViewController
+
+- (void)func_1001193ec {
+
+}
+
+%end
+
+
+void (*oldAssertionFailure)(id, id, id, unsigned int, u_int32_t);
+
+void newAssertionFailure(id staticString, id string, id file, unsigned int line, u_int32_t flags) {
+    // NSLog(staticString);
+    // NSLog(string);
+    // // NSLog(@"%@", staticString);
+    // // NSLog(@"%@", string);
+    // // NSLog(@"%@", file);
+    // // NSLog(@"%i", line);
+    // // NSLog(@"%i", flags);
+
+    // oldAssertionFailure(staticString, string, file, line, flags);
+}
+
+void nothing() {
+
+}
+
+
 %ctor {
-    %init(SileoAppDelegate = NSClassFromString(@"Sileo.AppDelegate"));
+    // MSImageRef image;
+    // const char *images[3];
+    // images[0] = "/Applications/Sileo.app/Sileo";
+    // images[1] = "/Applications/Sileo-Beta.app/Sileo";
+    // images[2] = "/Applications/Sileo-Nightly.app/Sileo";
+    // for (int i = 0; i < 3; i++) {
+        // image = MSGetImageByName(images[i]);
+        // if (image != NULL) {
+            // NSLog(@"neat");
+            // MSHookFunction(
+            //     MSFindSymbol(NULL, "_$ss17_assertionFailure__4file4line5flagss5NeverOs12StaticStringV_SSAHSus6UInt32VtF"), 
+            //     newAssertionFailure, 
+            //     (void **)&oldAssertionFailure
+            // );
+        // }
+    // }
+    // NSLog(@"%i", MSFindSymbol(NULL, "FUN_1000f0dc4") == NULL);
+    // MSHookFunction(
+    //     MSFindSymbol(NULL, "FUN_1000f0dc4"),
+    //     nothing,
+    //     NULL
+    // );
+    %init(SileoAppDelegate = NSClassFromString(@"Sileo.SileoAppDelegate"), FeaturedViewController = NSClassFromString(@"Sileo.FeaturedViewController"));
 }

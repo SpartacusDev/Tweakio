@@ -1,21 +1,25 @@
-#import "ZBMoreViewController.h"
+#import "TWMoreViewController.h"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
 
-@interface ZBMoreViewController ()
+@interface TWMoreViewController ()
 
 @end
 
-@implementation ZBMoreViewController
+@implementation TWMoreViewController
 
 - (instancetype)init {
     self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) self.viewControllers = [NSMutableArray array];
+    if (self) {
+        self.viewControllers = [NSMutableArray array];
+    }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.title = @"More";
     
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
 }
@@ -40,7 +44,7 @@
             // UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
             // [icon setImage:];
             // [cell setAccessoryView:icon];
-            [cell.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBSearch.png", bundlePath]]]];
+            [cell.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/TWSearch.png", bundlePath]]]];
             [cell.textLabel setText:@"Search"];
             [cell.textLabel setTextAlignment:NSTextAlignmentLeft];
             cell.semanticContentAttribute = UISemanticContentAttributeForceLeftToRight;
@@ -48,8 +52,8 @@
         }
         case 1: {
             // UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
-            // [icon setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBIcon.png", bundlePath]]]];
-            [cell.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/ZBIcon.png", bundlePath]]]];
+            // [icon setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/TWIcon.png", bundlePath]]]];
+            [cell.imageView setImage:[UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/TWIcon.png", bundlePath]]]];
             [cell.textLabel setText:@"Tweakio"];
             [cell.textLabel setTextAlignment:NSTextAlignmentLeft];
             cell.semanticContentAttribute = UISemanticContentAttributeForceLeftToRight;

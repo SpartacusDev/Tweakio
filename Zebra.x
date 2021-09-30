@@ -1,7 +1,7 @@
 // #import <objc/runtime.h>
 #import <Cephei/HBPreferences.h>
 #import "HookHeaders.h"
-#import "Tweakio/ZBMoreViewController.h"
+#import "Tweakio/TWMoreViewController.h"
 #define preferencesFileName @"com.spartacus.tweakioprefs.plist"
 #define bundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.spartacus.tweakio.bundle"
 
@@ -114,7 +114,7 @@
 
 	if (original) {
 		NSMutableArray<UINavigationController *> *controllers = [((UITabBarController *)self.window.rootViewController).viewControllers mutableCopy];
-		ZBMoreViewController *more = [[ZBMoreViewController alloc] init];
+		TWMoreViewController *more = [[TWMoreViewController alloc] init];
 		UINavigationController *navcont = [[UINavigationController alloc] initWithRootViewController:more];
 		UITabBarItem *searchTabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemMore tag:controllers.count];
 		[navcont setTabBarItem:searchTabBarItem];

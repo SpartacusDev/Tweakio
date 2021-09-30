@@ -44,7 +44,7 @@
 	[self.pickerView.widthAnchor constraintEqualToConstant:self.pickerView.frame.size.width].active = YES;
 	[self.pickerView.heightAnchor constraintEqualToConstant:self.pickerView.frame.size.height].active = YES;
 	[self.pickerView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-	[self.pickerView.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:25].active = YES;
+	[self.pickerView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
 
 	if ([self.pickerView selectedRowInComponent:0] == 0) [self presentSegmentedControl];
 }
@@ -53,6 +53,10 @@
 	[self.prefs setObject:[NSNumber numberWithInteger:row] forKey:[NSString stringWithFormat:@"%@ API", self.packageManager]];
 	switch (row) {
 		case 0: {
+			UIAlertController *deprecationNotice = [UIAlertController alertControllerWithTitle:@"Attention all passengers!" message:@"The Tweakio API is no longer maintained. You can still use it, but note that it is very outdated." preferredStyle:UIAlertControllerStyleAlert];
+			UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Got it!" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){}];
+			[deprecationNotice addAction:ok];
+			[self presentViewController:deprecationNotice animated:YES completion:NULL];
 			if (self.tweakioAPISearchingMethod && self.tweakioAPISearchingMethod.superview) return;
 			[self presentSegmentedControl];
 			break;

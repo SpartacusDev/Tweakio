@@ -2,7 +2,7 @@
 Search packages globally directly from your favourite package manager! Works with Cydia, Installer, Zebra and Sileo!
 
 ## How does it work
-The tweak adds an extra tab to each package manager, as you can see in the .x files. What's in the extra tab is the Tweakio view controller. The Tweakio search utilizes a restAPI, such as the Tweakio API, Parcility API, Canister API and iOS Repo Updates API. In order to choose the API (default is Tweakio API), you simply open the in-app settings in your package manager, select Tweakio (in Cydia you will see two button, `About` and `Tweakio`, in the rest you will see it at either top left or top right, depending on your device language) and then choose the API.
+The tweak adds an extra tab to each package manager or a button to the default search tab, as you can see in the `.x` files. What's in the extra tab/button is the Tweakio view controller. The Tweakio search utilizes a restAPI, such as the Tweakio API, Parcility API, Canister API and iOS Repo Updates API. In order to choose the API (default is Tweakio API), you simply open the in-app settings in the Tweakio tab, and then choose the API.
 
 ## Differences between the APIs
 * Tweakio API - Made by me, [Spartacus](https://github.com/SpartacusDev). Completely open sourced. Slow, contains over 500 repos, gives most results.

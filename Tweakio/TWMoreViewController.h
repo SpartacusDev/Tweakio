@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface ZBMoreViewController : UITableViewController
+@interface TWMoreViewController : UITableViewController
 
 @property (nonatomic, strong) NSMutableArray *viewControllers;
 
