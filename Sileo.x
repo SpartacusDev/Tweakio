@@ -89,56 +89,6 @@
 %end
 
 
-%hook FeaturedViewController
-
-- (void)func_1001193ec {
-
-}
-
-%end
-
-
-void (*oldAssertionFailure)(id, id, id, unsigned int, u_int32_t);
-
-void newAssertionFailure(id staticString, id string, id file, unsigned int line, u_int32_t flags) {
-    // NSLog(staticString);
-    // NSLog(string);
-    // // NSLog(@"%@", staticString);
-    // // NSLog(@"%@", string);
-    // // NSLog(@"%@", file);
-    // // NSLog(@"%i", line);
-    // // NSLog(@"%i", flags);
-
-    // oldAssertionFailure(staticString, string, file, line, flags);
-}
-
-void nothing() {
-
-}
-
-
 %ctor {
-    // MSImageRef image;
-    // const char *images[3];
-    // images[0] = "/Applications/Sileo.app/Sileo";
-    // images[1] = "/Applications/Sileo-Beta.app/Sileo";
-    // images[2] = "/Applications/Sileo-Nightly.app/Sileo";
-    // for (int i = 0; i < 3; i++) {
-        // image = MSGetImageByName(images[i]);
-        // if (image != NULL) {
-            // NSLog(@"neat");
-            // MSHookFunction(
-            //     MSFindSymbol(NULL, "_$ss17_assertionFailure__4file4line5flagss5NeverOs12StaticStringV_SSAHSus6UInt32VtF"), 
-            //     newAssertionFailure, 
-            //     (void **)&oldAssertionFailure
-            // );
-        // }
-    // }
-    // NSLog(@"%i", MSFindSymbol(NULL, "FUN_1000f0dc4") == NULL);
-    // MSHookFunction(
-    //     MSFindSymbol(NULL, "FUN_1000f0dc4"),
-    //     nothing,
-    //     NULL
-    // );
-    %init(SileoAppDelegate = NSClassFromString(@"Sileo.SileoAppDelegate"), FeaturedViewController = NSClassFromString(@"Sileo.FeaturedViewController"));
+    %init(SileoAppDelegate = NSClassFromString(@"Sileo.SileoAppDelegate"));
 }
