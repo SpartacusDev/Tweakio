@@ -100,7 +100,10 @@
     if (@available(iOS 13, *))
         self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
     else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+#pragma clang diagnostic pop
     [self.activityIndicator setCenter:self.view.center];
     [self.view addSubview:self.activityIndicator];
 
@@ -130,11 +133,102 @@
    [self.navigationController pushViewController:[[Settings alloc] initWithPackageManager:self.packageManager andBackgroundColor:self.view.backgroundColor] animated:YES];
 }
 
+- (void)apiTOSAndPrivacyPolicy:(int)api completionHandler:(void (^)(void))closure {
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
+
+    NSDictionary *links;
+    switch (api) {
+        case 0:
+        case 1:
+            break;
+        case 2:
+            links = @{
+                @"privacyPolicy": @"https://canister.me/privacy"
+            };
+            break;
+        case 3:
+            links = @{
+                @"privacyPolicy": @"https://www.ios-repo-updates.com/privacy/",
+                @"tos": @"https://www.ios-repo-updates.com/terms/"
+            };
+            break;
+        default:
+            return;
+    }
+
+    NSString *key = [NSString stringWithFormat:@"%@PrivacyPolicyTOS", 
+        api == 0 ? @"tweakio" : api == 1 ? @"parcility" : api == 2 ? @"canister" : @"iosRepoUpdates"
+    ];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Privacy Policy and/or TOS" message:[NSString stringWithFormat:@"Before using %@, please check their privacy policy and tos.", 
+            api == 0 ? @"Tweakio" : api == 1 ? @"Parcility" : api == 2 ? @"Canister" : @"iOS Repo Updates"
+        ] preferredStyle:UIAlertControllerStyleAlert];
+
+        __block BOOL confirmAdded = NO;
+
+        UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+            [prefs setBool:YES forKey:key];
+            closure();
+        }];
+        if ([links objectForKey:@"privacyPolicy"] != nil) {
+            UIAlertAction *privacyPolicy = [UIAlertAction actionWithTitle:@"Privacy Policy" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:links[@"privacyPolicy"]] options:@{} completionHandler:^(BOOL success){
+                    if (!confirmAdded) {
+                        [alert addAction:confirm];
+                        confirmAdded = YES;
+                    }
+                    [self presentViewController:alert animated:YES completion:NULL];
+                }];
+            }];
+            [alert addAction:privacyPolicy];
+        }
+        if ([links objectForKey:@"tos"] != nil) {
+            UIAlertAction *tos = [UIAlertAction actionWithTitle:@"Terms of Service" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:links[@"tos"]] options:@{} completionHandler:^(BOOL success){
+                    if (!confirmAdded) {
+                        [alert addAction:confirm];
+                        confirmAdded = YES;
+                    }
+                    [self presentViewController:alert animated:YES completion:NULL];
+                }];
+            }];
+            [alert addAction:tos];
+        }
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){
+            [prefs setBool:NO forKey:key];
+        }];
+
+        [alert addAction:cancel];
+
+        [self presentViewController:alert animated:YES completion:NULL];
+    });
+}
+
 - (void)search:(NSString *)query {
+    HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
+
+    NSString *key = [NSString stringWithFormat:@"%@PrivacyPolicyTOS", 
+        self.preferredAPI == 0 ? @"tweakio" : self.preferredAPI == 1 ? @"parcility" : self.preferredAPI == 2 ? @"canister" : @"iosRepoUpdates"
+    ];
+
+    if (![prefs boolForKey:key default:NO]) {
+        [self apiTOSAndPrivacyPolicy:self.preferredAPI completionHandler:^{
+            [self search:query];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.activityIndicator stopAnimating];
+                if ([self legacy])
+                    [self.tableView reloadData];
+                else
+                    [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results];
+            });
+        }];
+        return;
+    } 
+
     switch (self.preferredAPI) {
         case 0:
             @try {
-                HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:preferencesFileName];
                 BOOL fast = [prefs objectForKey:[NSString stringWithFormat:@"%@ Tweakio", self.packageManager]] ?
                             !((NSNumber *)([prefs objectForKey:[NSString stringWithFormat:@"%@ Tweakio", self.packageManager]])).boolValue :
                             YES;
@@ -384,7 +478,7 @@ NSArray<Result *> *parcilityAPI(NSString *query) {
 
 NSArray<Result *> *canisterAPI(NSString *query) {
     query = [query stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-    NSURL *api = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"https://api.canister.me/v1/community/packages/search?query=%@&searchFields=identifier,name,author,maintainer&responseFields=identifier,name,description,packageIcon,repository.uri,repository.name,author,latestVersion,depiction,section,price", query]];
+    NSURL *api = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"https://api.canister.me/v2/jailbreak/package/search?q=%@", query]];
     NSData *data = [NSData dataWithContentsOfURL:api];
     if (!data) {
         @throw [[NSException alloc] initWithName:@"APIException" reason:@"UNKNOWN" userInfo:nil];
@@ -401,18 +495,18 @@ NSArray<Result *> *canisterAPI(NSString *query) {
             icon = [UIImage imageWithData:[NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/unknown.png", bundlePath]]];
 
         NSString *iconURL;
-        if (((NSObject *)result[@"packageIcon"]).class == NSNull.class || [result[@"packageIcon"] isEqual:@""] || [result[@"packageIcon"] hasPrefix:@"file://"] || ((NSObject *)results[@"packageIcon"]).class == NSNull.class) {
+        if (((NSObject *)result[@"icon"]).class == NSNull.class || [result[@"icon"] isEqual:@""] || [result[@"icon"] hasPrefix:@"file://"] || ((NSObject *)results[@"icon"]).class == NSNull.class) {
             iconURL = [NSString stringWithFormat:@"%@/%@.png", bundlePath, result[@"section"]];
             if (![[NSFileManager defaultManager] fileExistsAtPath:iconURL])
                 iconURL = [NSString stringWithFormat:@"%@/unknown.png", bundlePath];
         }
         else
-            iconURL = result[@"packageIcon"];
+            iconURL = result[@"icon"];
 
         NSDictionary *data = @{
             @"name": result[@"name"],
-            @"package": result[@"identifier"],
-            @"version": result[@"latestVersion"],
+            @"package": result[@"package"],
+            @"version": result[@"version"],
             @"description": result[@"description"],
             @"author": result[@"author"] && ((NSObject *)result[@"author"]).class != NSNull.class ? result[@"author"] : @"UNKNOWN",
             @"icon": icon,
