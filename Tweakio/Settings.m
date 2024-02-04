@@ -51,15 +51,23 @@
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
 	[self.prefs setObject:[NSNumber numberWithInteger:row] forKey:[NSString stringWithFormat:@"%@ API", self.packageManager]];
+	NSString *msg;
 	switch (row) {
-		case 0: {
-			UIAlertController *deprecationNotice = [UIAlertController alertControllerWithTitle:@"Attention all passengers!" message:@"The Tweakio API is no longer maintained. You can still use it, but note that it is very outdated." preferredStyle:UIAlertControllerStyleAlert];
+		case 0:
+			msg = @"The Tweakio API no longer works. Please choose another API.";
+		case 1: {
+			if (msg == nil) {
+				msg = @"The Parcility API no longer works. Please choose another API.";
+			}
+			UIAlertController *deprecationNotice = [UIAlertController alertControllerWithTitle:@"Attention all passengers!" message:msg preferredStyle:UIAlertControllerStyleAlert];
 			UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Got it!" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){}];
 			[deprecationNotice addAction:ok];
 			[self presentViewController:deprecationNotice animated:YES completion:NULL];
-			if (self.tweakioAPISearchingMethod && self.tweakioAPISearchingMethod.superview) return;
-			[self presentSegmentedControl];
-			break;
+			if (row == 0) {
+				if (self.tweakioAPISearchingMethod && self.tweakioAPISearchingMethod.superview) return;
+				[self presentSegmentedControl];
+				break;
+			}
 		}
 		default:
 			[self.tweakioAPISearchingMethod removeFromSuperview];

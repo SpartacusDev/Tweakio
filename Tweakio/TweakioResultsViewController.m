@@ -18,7 +18,10 @@
         if (@available(iOS 13, *))
             activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
         else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+#pragma clang diagnostic pop
         [activityIndicatorView setCenter:self.center];
         [self addSubview:activityIndicatorView];
 
@@ -31,7 +34,7 @@
 }
 
 - (NSNumber *)hasBeenSetup {
-    return objc_getAssociatedObject(self, @selector(icon));
+    return objc_getAssociatedObject(self, @selector(hasBeenSetup));
 }
 
 @end
