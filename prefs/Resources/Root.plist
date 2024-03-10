@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+		<array>
+
+			<dict>
+				<key>cellClass</key>
+					<string>TWContact</string>
+				<key>label</key>
+					<string>SpartacusDev</string>
+				<key>user</key>
+					<string>SpartacusDev</string>
+				<key>iconURL</key>
+					<string>https://spartacusdev.github.io/assets/SpartacusDev.png</string>
+				<key>id</key>
+					<string>contactCell</string>
+			</dict>
+		
+			
+			<dict>
+				<key>cell</key>
+					<string>PSGroupCell</string>
+				<key>label</key>
+					<string>Links</string>
+			</dict>
+
+			<dict>
+				<key>cellClass</key>
+					<string>HBLinkTableCell</string>
+				<key>url</key>
+					<string>https://github.com/SpartacusDev/Tweakio</string>
+				<key>label</key>
+					<string>Github Repository</string>
+			</dict>
+
+			<dict>
+				<key>cellClass</key>
+					<string>HBLinkTableCell</string>
+				<key>url</key>
+					<string>https://discord.gg/mZZhnRDGeg</string>
+				<key>label</key>
+					<string>Join the Discord Server</string>
+			</dict>
+
+			<dict>
+				<key>cell</key>
+					<string>PSGroupCell</string>
+				<key>label</key>
+					<string>API Explanation</string>
+				<key>footerAlignment</key>
+					<string>0</string>
+				<key>footerText</key>
+					<string>In order to use the tweak, make sure to install a Tweakio Plugin</string>
+			</dict>
+
+			<dict>
+				<key>cell</key>
+					<string>PSGroupCell</string>
+				<key>label</key>
+					<string>Examples for APIs</string>
+			</dict>
+
+			<dict>
+				<key>cellClass</key>
+					<string>HBLinkTableCell</string>
+				<key>label</key>
+					<string>Canister</string>
+				<key>url</key>
+					<string>https://spartacusdev.github.io</string>
+			</dict>
+
+			<dict>
+				<key>cellClass</key>
+					<string>HBLinkTableCell</string>
+				<key>label</key>
+					<string>iOS Repo Updates</string>
+				<key>url</key>
+					<string>https://spartacusdev.github.io</string>
+			</dict>
+		
+		</array>
+
+	<key>title</key>
+		<string>Tweakio</string>
+
+</dict>
+</plist>

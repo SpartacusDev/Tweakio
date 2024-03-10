@@ -8,6 +8,7 @@
                     <array>
                         <string>com.saurik.Cydia</string>
                         <string>xyz.willy.Zebra</string>
+                        <string>xyz.willy.Zebralpha</string>
                         <string>me.apptapp.installer</string>
                         <string>org.coolstar.SileoStore</string>
                         <string>org.coolstar.SileoBeta</string>
