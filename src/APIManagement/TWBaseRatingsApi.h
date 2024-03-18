@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_END
 @property (nonatomic, strong, nullable) NSArray<NSString *> *options;
 
 NS_ASSUME_NONNULL_BEGIN
-- (void)search:(Result *)package error:(NSError **)error completionHandler:(void (^)(float, NSArray<TWReview *> *))completionHandler;
+- (void)search:(Result *)package completionHandler:(void (^)(float, NSArray<TWReview *> *, NSError *))completionHandler;
 NS_ASSUME_NONNULL_END
 
 @end

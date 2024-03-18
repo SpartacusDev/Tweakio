@@ -148,29 +148,44 @@
 }
 
 - (void)search:(NSString *)query onError:(void (^)(NSError *))onError {
-    NSError *error;
-
-    [self.apiManager search:query api:self.preferredAPI onNoConfirmation:^(NSString *api) {
+    NSError *err;
+    [self.apiManager search:query error:&err api:self.preferredAPI onNoConfirmation:^(NSString *api) {
         [self.apiManager viewController:self apiTOSAndPrivacyPolicy:api ratings:NO completionHandler:^{
             [self search:query onError:onError];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.activityIndicator stopAnimating];
-                if ([self legacy]) {
-                    [self.tableView reloadData];
-                } else {
-                    [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results];
-                }
-            });
         }];
-    } onFinish:^(NSArray<Result *> *results) {
-        self.results = [results copy];
-        if (self.results.count != 0)
-            [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
-    } error:&error];
+    } onFinish:^(NSArray<Result *> *results, NSError *error) {
+        if (error) {
+            self.results = @[];
+            onError(error);
+        } else {
+            self.results = [results copy];
+        }
 
-    if (error != nil) {
+        if (self.results.count != 0) {
+            [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.activityIndicator stopAnimating];
+            if ([self legacy]) {
+                [self.tableView reloadData];
+            } else {
+                [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results];
+            }
+        });
+    }];
+
+    if (err) {
         self.results = @[];
-        onError(error);
+        onError(err);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.activityIndicator stopAnimating];
+            if ([self legacy]) {
+                [self.tableView reloadData];
+            } else {
+                [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results];
+            }
+        });
     }
 }
 
@@ -195,7 +210,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self search:tweak onError:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", error.localizedDescription] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", error.localizedFailureReason] preferredStyle:UIAlertControllerStyleAlert];
                 [self presentViewController:alert animated:YES completion:^{
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         [alert dismissViewControllerAnimated:YES completion:NULL];
@@ -203,14 +218,6 @@
                 }];
             });
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.activityIndicator stopAnimating];
-            if ([self legacy]) {
-                [self.tableView reloadData];
-            } else {
-                [((TweakioResultsViewController *)self.searchController.searchResultsController) setupWithResults:self.results];
-            }
-        });
     });
 }
 

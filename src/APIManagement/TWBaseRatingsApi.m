@@ -8,8 +8,11 @@
 
 @implementation TWBaseRatingsApi
 
-- (void)search:(Result *)package error:(NSError **)error completionHandler:(void (^)(float, NSArray<TWReview *> *))completionHandler {
-    [NSException raise:@"Method - (void)search:error:completionHandler: not defined" format:@"This method needs to be defined in a subclass"];
+- (void)search:(Result *)package completionHandler:(void (^)(float, NSArray<TWReview *> *, NSError *))completionHandler {
+    completionHandler(-1, nil, [[NSError alloc] initWithDomain:@"com.spartacus.tweakio" code:1 userInfo:@{   
+        NSLocalizedDescriptionKey: @"Method not implemented",
+        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Method [%@ search:completionHandler:] is not implemented", NSStringFromClass(self.class)]
+    }]);
 }
 
 @end

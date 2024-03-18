@@ -40,7 +40,7 @@
 
     NSString *ratingString = @"";
     for (int i = 0; i < 5; i++) {
-        ratingString = [ratingString stringByAppendingString:self.reviews[indexPath.row].rating >= i ? @"★" : @"☆" @"⯨"];
+        ratingString = [ratingString stringByAppendingString:self.reviews[indexPath.row].rating >= i ? @"★" : @"☆"];
     }
     ratingString = [NSString stringWithFormat:@"%@ %i ", ratingString, self.reviews[indexPath.row].rating];
 

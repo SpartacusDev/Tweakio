@@ -5,7 +5,7 @@
 #import "src/common.h"
 #import <Cephei/HBPreferences.h>
 #import "TWReviewViewController.h"
-
+#import <math.h>
 
 @interface TweakViewController ()
 
@@ -119,8 +119,12 @@
     if (self.package.rating != -1) {
         NSString *ratingString = @"Rating: ";
 
-        for (int i = 0; i < 5; i++) {
-            ratingString = [ratingString stringByAppendingString:(int)self.package.rating >= i ? @"★" : @"☆" @"⯨"];
+        if (round(self.package.rating) == 0) {
+            ratingString = [ratingString stringByAppendingString:@"☆☆☆☆☆"];
+        } else {
+            for (int i = 0; i < 5; i++) {
+                ratingString = [ratingString stringByAppendingString:round(self.package.rating) >= i ? @"★" : @"☆"];
+            }
         }
         ratingString = [NSString stringWithFormat:@"%@%.1f ", ratingString, self.package.rating];
 
@@ -137,21 +141,35 @@
     HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:PREFERENCES_FILE_NAME];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *error;
-        [apiManager ratingsSearch:self.package api:[prefs objectForKey:[NSString stringWithFormat:@"%@ ratings API", self.packageManager] default:[apiManager ratingsOptions][0].prefsValue] onNoConfirmation:^(NSString *api) {
-            LOG(@"TWEAKIO: Where am I?");
+        NSError *err;
+        [apiManager ratingsSearch:self.package error:&err api:[prefs objectForKey:[NSString stringWithFormat:@"%@ ratings API", self.packageManager] default:[apiManager ratingsOptions][0].prefsValue] onNoConfirmation:^(NSString *api) {
             [apiManager viewController:self apiTOSAndPrivacyPolicy:api ratings:YES completionHandler:^{
-                LOG(@"TWEAKIO: Who am I?");
                 [self packageRating];
             }];
-        } onFinish:^(float rating, NSArray<TWReview *> *reviews) {
+        } onFinish:^(float rating, NSArray<TWReview *> *reviews, NSError *error) {
+            if (error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred while getting package rating and reviews" message:[NSString stringWithFormat:@"Please try again later or change ratings API. Error message: %@", error.localizedFailureReason] preferredStyle:UIAlertControllerStyleAlert];
+                    [self presentViewController:alert animated:YES completion:^{
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            [alert dismissViewControllerAnimated:YES completion:NULL];
+                        });
+                    }];
+                });
+                return;
+            }
+
             self.package.rating = rating;
             self.package.reviews = reviews;
 
             NSString *ratingString = @"Rating: ";
 
-            for (int i = 0; i < 5; i++) {
-                ratingString = [ratingString stringByAppendingString:(int)rating >= i ? @"★" : @"☆"];
+            if (round(rating) == 0) {
+                ratingString = [ratingString stringByAppendingString:@"☆☆☆☆☆"];
+            } else {
+                for (int i = 0; i < 5; i++) {
+                    ratingString = [ratingString stringByAppendingString:round(rating) >= i ? @"★" : @"☆"];
+                }
             }
             ratingString = [NSString stringWithFormat:@"%@ %.1f ", ratingString, rating];
 
@@ -160,14 +178,13 @@
             self.information = [_mutableInformation copy];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                LOG(@"TWEAKIO: What am I?");
                 [self.tableView reloadData];
             });
-        } error:&error];
+        }];
 
-        if (error) {
+        if (err) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred while getting package rating and reviews" message:[NSString stringWithFormat:@"Please try again later or change ratings API. Error message: %@", error.localizedDescription] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"An error has occurred while searching for reviews" message:[NSString stringWithFormat:@"Please try again later or change API. Error message: %@", err.localizedFailureReason] preferredStyle:UIAlertControllerStyleAlert];
                 [self presentViewController:alert animated:YES completion:^{
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         [alert dismissViewControllerAnimated:YES completion:NULL];
@@ -213,13 +230,28 @@
     __block UIAlertController *popup = [UIAlertController alertControllerWithTitle:@"Downloading..." message:nil preferredStyle:UIAlertControllerStyleAlert];
     [self presentViewController:popup animated:YES completion:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            
             NSData *packageData = [[NSData alloc] initWithContentsOfURL:self.package.downloadURL];
-            NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[self.package.package stringByAppendingString:@".deb"]]];
-            [packageData writeToFile:[fileURL absoluteString] atomically:YES];
+            NSURL *fileURL = [fileManager.temporaryDirectory URLByAppendingPathComponent:[self.package.package stringByAppendingString:@".deb"]];
+
+            NSError *error;
+            [packageData writeToFile:fileURL.path options:NSDataWritingAtomic error:&error];
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 [popup dismissViewControllerAnimated:YES completion:NULL];
-                UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[fileURL] applicationActivities:nil];
-                [self presentViewController:activityViewController animated:YES completion:NULL];
+
+                if (!error) {
+                    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[fileURL] applicationActivities:nil];
+                    [self presentViewController:activityViewController animated:YES completion:NULL];
+                } else {
+                    UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:@"An error has occurred" message:error.description preferredStyle:UIAlertControllerStyleAlert];
+                    [self presentViewController:errorAlert animated:YES completion:^{
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            [errorAlert dismissViewControllerAnimated:YES completion:NULL];
+                        });
+                    }];
+                }
             });
         });
     }];

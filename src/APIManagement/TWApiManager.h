@@ -7,8 +7,8 @@
 @interface TWApiManager : NSObject
 
 + (instancetype)sharedInstance;
-- (void)search:(NSString *)query api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(NSArray<Result *> *))onFinish error:(NSError **)error;
-- (void)ratingsSearch:(Result *)query api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(float, NSArray<TWReview *> *))onFinish error:(NSError **)error;
+- (void)search:(NSString *)query error:(NSError **)error api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(NSArray<Result *> *, NSError *))onFinish;
+- (void)ratingsSearch:(Result *)query error:(NSError **)error api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(float, NSArray<TWReview *> *, NSError *))onFinish;
 - (NSArray<__kindof TWBaseApi *> *)options;
 - (NSArray<__kindof TWBaseRatingsApi *> *)ratingsOptions;
 - (TWBaseRatingsApi *)ratingsApiForKey:(NSString *)key;

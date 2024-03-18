@@ -82,7 +82,7 @@
 }
 
 - (TWBaseRatingsApi *)ratingsApiForKey:(NSString *)key {
-    for (TWBaseRatingsApi *api in [self ratingsOptions]) {
+    for (__kindof TWBaseRatingsApi *api in [self ratingsOptions]) {
         if ([api.prefsValue isEqualToString:key]) {
             return api;
         }
@@ -91,7 +91,7 @@
 }
 
 - (TWBaseApi *)apiForKey:(NSString *)key {
-    for (TWBaseApi *api in [self options]) {
+    for (__kindof TWBaseApi *api in [self options]) {
         if ([api.prefsValue isEqualToString:key]) {
             return api;
         }
@@ -108,11 +108,23 @@
     return NO;
 }
 
-- (void)search:(NSString *)query api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(NSArray<Result *> *))onFinish error:(NSError **)error {
+- (void)search:(NSString *)query error:(NSError **)error api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(NSArray<Result *> *, NSError *))onFinish {
     __kindof TWBaseApi *apiHandler = [self apiForKey:api];
 
     if (apiHandler == nil) {
-        [NSException raise:@"Failed to find API handler" format:@"Couldn't find API handler for key %@", api];
+        *error = [[NSError alloc] initWithDomain:@"com.spartacus.tweakio.canister" code:1 userInfo:@{   
+            NSLocalizedDescriptionKey: @"Failed to find API handler",
+            NSLocalizedFailureReasonErrorKey: [@"Couldn't find API handler for key " stringByAppendingString:api]
+        }];
+        return;
+    }
+
+    if ([apiHandler respondsToSelector:@selector(search:error:completionHandler:)]) {
+        *error = [[NSError alloc] initWithDomain:@"com.spartacus.tweakio.canister" code:1 userInfo:@{   
+            NSLocalizedDescriptionKey: @"API handler not supported",
+            NSLocalizedFailureReasonErrorKey: @"Current API handler uses old method of searching and needs to be updated to support this version of Tweakio"
+        }];
+        return;
     }
 
     NSString *key = [NSString stringWithFormat:@"%@-PrivacyPolicyTOS", apiHandler.prefsValue];
@@ -122,14 +134,26 @@
         return;
     }
 
-    [apiHandler search:query error:error completionHandler:onFinish];
+    [apiHandler search:query completionHandler:onFinish];
 }
 
-- (void)ratingsSearch:(Result *)query api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(float, NSArray<TWReview *> *))onFinish error:(NSError **)error {
+- (void)ratingsSearch:(Result *)query error:(NSError **)error api:(NSString *)api onNoConfirmation:(void (^)(NSString *))onNoConfirmation onFinish:(void (^)(float, NSArray<TWReview *> *, NSError *))onFinish {
     __kindof TWBaseRatingsApi *apiHandler = [self ratingsApiForKey:api];
 
     if (apiHandler == nil) {
-        [NSException raise:@"Failed to find API handler" format:@"Couldn't find API handler for key %@", api];
+        *error = [[NSError alloc] initWithDomain:@"com.spartacus.tweakio" code:1 userInfo:@{   
+            NSLocalizedDescriptionKey: @"Failed to find API handler",
+            NSLocalizedFailureReasonErrorKey: [@"Couldn't find API handler for key " stringByAppendingString:api]
+        }];
+        return;
+    }
+
+    if ([apiHandler respondsToSelector:@selector(search:error:completionHandler:)]) {
+        *error = [[NSError alloc] initWithDomain:@"com.spartacus.tweakio" code:1 userInfo:@{   
+            NSLocalizedDescriptionKey: @"API handler not supported",
+            NSLocalizedFailureReasonErrorKey: @"Current API handler uses old method of searching and needs to be updated to support this version of Tweakio"
+        }];
+        return;
     }
 
     NSString *key = [NSString stringWithFormat:@"%@-PrivacyPolicyTOS", apiHandler.prefsValue];
@@ -139,7 +163,7 @@
         return;
     }
 
-    [apiHandler search:query error:error completionHandler:onFinish];
+    [apiHandler search:query completionHandler:onFinish];
 }
 
 - (void)viewController:(UIViewController *)viewController apiTOSAndPrivacyPolicy:(NSString *)api ratings:(BOOL)ratings completionHandler:(void (^)(void))closure {
