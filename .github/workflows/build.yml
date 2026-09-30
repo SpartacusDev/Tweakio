@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Dopamine / palera1n / roothide (iOS 15+), /var/jb layout.
+          - name: rootless
+            make_args: ROOTLESS=1
+            artifact: Tweakio-rootless
+          # unc0ver / checkra1n / Taurine (iOS 12-14), classic layout.
+          - name: rootful
+            make_args: ""
+            artifact: Tweakio-rootful
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Theos
+        run: |
+          # --recursive is required: rootless.h (vendor/include), libroot and the
+          # Cephei/CepheiPrefs frameworks (vendor/lib) are all submodules.
+          git clone --recursive https://github.com/theos/theos.git "$HOME/theos"
+          echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
+          echo "$HOME/theos/bin" >> "$GITHUB_PATH"
+
+      - name: Install build dependencies
+        run: brew install ldid dpkg
+
+      - name: Build package
+        run: |
+          make package FINALPACKAGE=1 ${{ matrix.make_args }}
+          ls -l packages/
+
+      - name: Verify package
+        run: |
+          deb=$(ls packages/*.deb | head -n1)
+          echo "Package: $deb"
+          dpkg-deb -I "$deb"
+          echo "--- payload (top levels) ---"
+          dpkg-deb -c "$deb" | head -n 30
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: packages/*.deb
+          if-no-files-found: error
+          retention-days: 30

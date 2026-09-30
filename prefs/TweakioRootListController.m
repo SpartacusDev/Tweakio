@@ -49,7 +49,10 @@ typedef enum PackageManager : int {
 	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
 	[headerView setBackgroundColor:[UIColor hb_colorWithPropertyListValue:@"#000000"]];
 	UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
-	[imageView setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/TweakioPrefs.bundle/banner.png"]];
+	// Resolve the banner through the bundle itself so it also works on rootless
+	// jailbreaks, where the bundle lives in /var/jb/Library/PreferenceBundles.
+	NSBundle *prefsBundle = [NSBundle bundleForClass:[self class]];
+	[imageView setImage:[UIImage imageWithContentsOfFile:[prefsBundle pathForResource:@"banner" ofType:@"png"]]];
 	[imageView setContentMode:UIViewContentModeScaleAspectFill];
 	[imageView setClipsToBounds:YES];
 

@@ -37,7 +37,7 @@
         NSString *pm = getPackageManager();
         NSFileManager *fm = [NSFileManager defaultManager];
         if ([pm isEqualToString:@"Cydia"]) {
-            NSString *imagePath = [NSString stringWithFormat:@"/Applications/Cydia.app/Sections/%@", self.section];
+            NSString *imagePath = [NSString stringWithFormat:ROOT_PATH_NS(@"/Applications/Cydia.app/Sections/%@"), self.section];
             if ([fm fileExistsAtPath:imagePath]) {
                 self.icon = [[UIImage alloc] initWithContentsOfFile:imagePath];
             }
